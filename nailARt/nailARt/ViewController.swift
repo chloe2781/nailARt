@@ -13,6 +13,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     
+    var rectangleNode: SCNNode?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -23,7 +25,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.showsStatistics = true
         
         // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+        let scene = SCNScene()
+        
+        // Create a rectangle
+        let rectangle = SCNPlane(width: 0.05, height: 0.1)
+        rectangle.materials.first?.diffuse.contents = UIColor.black
+        
+        // Create a node to hold the rectangle
+        rectangleNode = SCNNode(geometry: rectangle)
+        scene.rootNode.addChildNode(rectangleNode!)
         
         // Set the scene to the view
         sceneView.scene = scene
