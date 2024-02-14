@@ -1,5 +1,5 @@
 //
-//  SignUpView.swift
+//  ExploreView.swift
 //  nailARt
 //
 //  Created by Chloe Nguyen on 2/14/24.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SignUpView: UIViewController {
+class ExploreView: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
