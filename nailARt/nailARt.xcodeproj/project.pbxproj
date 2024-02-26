@@ -7,15 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E17370E12B87048C00569168 /* HandTracking in Frameworks */ = {isa = PBXBuildFile; productRef = E17370E02B87048C00569168 /* HandTracking */; };
 		E19289BA2B73354000F3C292 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19289B92B73354000F3C292 /* AppDelegate.swift */; };
 		E19289BC2B73354000F3C292 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = E19289BB2B73354000F3C292 /* art.scnassets */; };
 		E19289BE2B73354000F3C292 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19289BD2B73354000F3C292 /* ViewController.swift */; };
 		E19289C12B73354000F3C292 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E19289BF2B73354000F3C292 /* Main.storyboard */; };
 		E19289C32B73354100F3C292 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E19289C22B73354100F3C292 /* Assets.xcassets */; };
 		E19289C62B73354100F3C292 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E19289C42B73354100F3C292 /* LaunchScreen.storyboard */; };
+		E1EE66902B8BD442002C857F /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1EE668F2B8BD442002C857F /* CameraViewController.swift */; };
+		E1EE66942B8BEFD3002C857F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1EE66932B8BEFD3002C857F /* SceneDelegate.swift */; };
+		E1FBBFA52B8D3CD000751EC6 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FBBFA42B8D3CD000751EC6 /* CameraView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E17370DE2B86932400569168 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E19289B62B73354000F3C292 /* nailARt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nailARt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E19289B92B73354000F3C292 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E19289BB2B73354000F3C292 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -23,6 +28,9 @@
 		E19289C02B73354000F3C292 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E19289C22B73354100F3C292 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E19289C52B73354100F3C292 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E1EE668F2B8BD442002C857F /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
+		E1EE66932B8BEFD3002C857F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		E1FBBFA42B8D3CD000751EC6 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -30,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E17370E12B87048C00569168 /* HandTracking in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,12 +64,16 @@
 		E19289B82B73354000F3C292 /* nailARt */ = {
 			isa = PBXGroup;
 			children = (
-				E19289B92B73354000F3C292 /* AppDelegate.swift */,
+				E17370DE2B86932400569168 /* Info.plist */,
 				E19289BB2B73354000F3C292 /* art.scnassets */,
 				E19289BD2B73354000F3C292 /* ViewController.swift */,
+				E1EE668F2B8BD442002C857F /* CameraViewController.swift */,
+				E19289B92B73354000F3C292 /* AppDelegate.swift */,
+				E1EE66932B8BEFD3002C857F /* SceneDelegate.swift */,
 				E19289BF2B73354000F3C292 /* Main.storyboard */,
 				E19289C22B73354100F3C292 /* Assets.xcassets */,
 				E19289C42B73354100F3C292 /* LaunchScreen.storyboard */,
+				E1FBBFA42B8D3CD000751EC6 /* CameraView.swift */,
 			);
 			path = nailARt;
 			sourceTree = "<group>";
@@ -81,6 +94,9 @@
 			dependencies = (
 			);
 			name = nailARt;
+			packageProductDependencies = (
+				E17370E02B87048C00569168 /* HandTracking */,
+			);
 			productName = nailARt;
 			productReference = E19289B62B73354000F3C292 /* nailARt.app */;
 			productType = "com.apple.product-type.application";
@@ -109,6 +125,9 @@
 				Base,
 			);
 			mainGroup = E19289AD2B73354000F3C292;
+			packageReferences = (
+				E17370DF2B87048C00569168 /* XCRemoteSwiftPackageReference "BodyTracking" */,
+			);
 			productRefGroup = E19289B72B73354000F3C292 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -138,7 +157,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				E19289BE2B73354000F3C292 /* ViewController.swift in Sources */,
+				E1FBBFA52B8D3CD000751EC6 /* CameraView.swift in Sources */,
+				E1EE66902B8BD442002C857F /* CameraViewController.swift in Sources */,
 				E19289BA2B73354000F3C292 /* AppDelegate.swift in Sources */,
+				E1EE66942B8BEFD3002C857F /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,14 +314,15 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6GDG5XDN45;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_FILE = nailARt/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This application uses the camera to project nail designs onto your hands";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arkit;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -307,6 +330,8 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = edu.columbia.nailARt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -322,14 +347,15 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6GDG5XDN45;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_FILE = nailARt/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This application uses the camera to project nail designs onto your hands";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arkit;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -337,6 +363,8 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = edu.columbia.nailARt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -365,6 +393,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E17370DF2B87048C00569168 /* XCRemoteSwiftPackageReference "BodyTracking" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Reality-Dev/BodyTracking";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.31;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E17370E02B87048C00569168 /* HandTracking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E17370DF2B87048C00569168 /* XCRemoteSwiftPackageReference "BodyTracking" */;
+			productName = HandTracking;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E19289AE2B73354000F3C292 /* Project object */;
 }

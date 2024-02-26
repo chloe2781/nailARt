@@ -1,0 +1,32 @@
+{
+  "pins" : [
+    {
+      "identity" : "bodytracking",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Reality-Dev/BodyTracking",
+      "state" : {
+        "revision" : "6acc3944caea426f2c5680b42eef2cd36ff8d48d",
+        "version" : "2.0.31"
+      }
+    },
+    {
+      "identity" : "realitykit-utilities",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Reality-Dev/RealityKit-Utilities",
+      "state" : {
+        "revision" : "91277a9f3f568f20a5af69b176137f9444f8058e",
+        "version" : "1.0.64"
+      }
+    },
+    {
+      "identity" : "realitymorpher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Reality-Dev/RealityMorpher",
+      "state" : {
+        "revision" : "da6e32a4aab91061d948c208797cf522963b8edd",
+        "version" : "2.0.11"
+      }
+    }
+  ],
+  "version" : 2
+}
