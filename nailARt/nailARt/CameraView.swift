@@ -1,10 +1,3 @@
-//
-//  CameraView.swift
-//  nailARt
-//
-//  Created by Elizabeth Commisso on 2/25/24.
-//
-
 /*
 See LICENSE folder for this sample’s licensing information.
 
@@ -20,6 +13,8 @@ class CameraView: UIView {
 
     private var overlayLayer = CAShapeLayer()
     private var pointsPath = UIBezierPath()
+    var drawnLayers: [CALayer] = []
+
 
     var previewLayer: AVCaptureVideoPreviewLayer {
         return layer as! AVCaptureVideoPreviewLayer
@@ -63,14 +58,30 @@ class CameraView: UIView {
 //        CATransaction.commit()
 //    }
     
-    func drawDot(at point: CGPoint, color: UIColor) {
-        let dotLayer = CALayer()
-        dotLayer.bounds = CGRect(x: 0, y: 0, width: 10, height: 10)
-        dotLayer.position = point
-        dotLayer.cornerRadius = 5
-        dotLayer.backgroundColor = color.cgColor
-        overlayLayer.sublayers?.forEach { $0.removeFromSuperlayer() } // Remove previous dots
-        overlayLayer.addSublayer(dotLayer)
+
+    
+    func showPoints(_ points: [CGPoint], color: UIColor) {
+        // Clear previous points
+        clearPoints()
+
+        // draw rectangles at the specified points. later: adjust sizing versus hand distance
+        for point in points {
+            let rectangleLayer = CALayer()
+            let rectangleSize = CGSize(width: 25, height: 40)
+            rectangleLayer.bounds = CGRect(origin: .zero, size: rectangleSize)
+            rectangleLayer.position = point
+            rectangleLayer.cornerRadius = 10
+            rectangleLayer.backgroundColor = UIColor.black.cgColor
+            layer.addSublayer(rectangleLayer)
+            drawnLayers.append(rectangleLayer)
+        }
+    }
+
+    
+    func clearPoints() {
+        for layer in drawnLayers {
+            layer.removeFromSuperlayer()
+        }
+        drawnLayers.removeAll()
     }
 }
-

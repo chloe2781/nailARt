@@ -1,43 +1,44 @@
-//
-//  CameraViewController.swift
-//  nailARt
-//
-//  Created by Elizabeth Commisso on 2/25/24.
-//
+/*
+See LICENSE folder for this sample’s licensing information.
+
+Abstract:
+The app's main view controller object.
+*/
 
 import UIKit
 import AVFoundation
 import Vision
 
 class CameraViewController: UIViewController {
-    
-    private var cameraView: CameraView {
-        guard let cameraView = view as? CameraView else {
-            fatalError("The view is not of type CameraView.")
-        }
-        return cameraView
-    }
+
+    private var cameraView: CameraView { view as! CameraView }
     
     private let videoDataOutputQueue = DispatchQueue(label: "CameraFeedDataOutput", qos: .userInteractive)
     private var cameraFeedSession: AVCaptureSession?
     private var handPoseRequest = VNDetectHumanHandPoseRequest()
     
-    //    private var evidenceBuffer = [HandGestureProcessor.PointsPair]()
+    private let drawOverlay = CAShapeLayer()
+    private let drawPath = UIBezierPath()
+    private var evidenceBuffer = [HandGestureProcessor.PointsPair]()
+    private var lastDrawPoint: CGPoint?
+    private var isFirstSegment = true
+    private var lastObservationTimestamp = Date()
     
-    
-    //    private var gestureProcessor = HandGestureProcessor()
+    private var gestureProcessor = HandGestureProcessor()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        drawOverlay.frame = view.layer.bounds
+        view.layer.addSublayer(drawOverlay)
         
-        
+        // detect 2 hands
         handPoseRequest.maximumHandCount = 2
         // Add state change handler to hand gesture processor.
-        //        gestureProcessor.didChangeStateClosure = { [weak self] state in
-        //            self?.handleGestureStateChange(state: state)
-        //        }
+        gestureProcessor.didChangeStateClosure = { [weak self] state in
+            self?.handleGestureStateChange(state: state)
+        }
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         do {
@@ -89,44 +90,51 @@ class CameraViewController: UIViewController {
         }
         session.commitConfiguration()
         cameraFeedSession = session
-    }
+}
     
-    func processPoints(indexTip: CGPoint?) {
-        // Check that we have the point
-        guard let indexPoint = indexTip else {
-//            // If there were no observations for more than 2 seconds reset gesture processor.
+    func processPoints(thumbTip: CGPoint?, indexTip: CGPoint?) {
+        // Check that we have both points.
+        guard let thumbPoint = thumbTip, let indexPoint = indexTip else {
+            // If there were no observations for more than 2 seconds reset gesture processor.
 //            if Date().timeIntervalSince(lastObservationTimestamp) > 2 {
 //                gestureProcessor.reset()
 //            }
-            // cameraView.showPoints([], color: .clear)
+            // CLEARS the points when hand leaves the frame
+            cameraView.showPoints([], color: .clear)
             return
         }
         
-        // Draw a black dot on the index finger tip
-        cameraView.drawDot(at: indexPoint, color: .black)
-
-        // Print the coordinates
-        print("Index Finger Tip Coordinates: \(indexPoint)")
-        
-        // Convert point from AVFoundation coordinates to UIKit coordinates.
+        // Convert points from AVFoundation coordinates to UIKit coordinates.
         let previewLayer = cameraView.previewLayer
+        let thumbPointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: thumbPoint)
         let indexPointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: indexPoint)
         
-        // Process new points
-//        gestureProcessor.processPointsPair((thumbPointConverted, indexPointConverted))
+//        print("Index Finger Tip Coordinates: \(indexPointConverted)")
         
+        // Process new points
+        gestureProcessor.processPointsPair((thumbPointConverted, indexPointConverted))
     }
     
-}
+    private func handleGestureStateChange(state: HandGestureProcessor.State) {
+        let pointsPair = gestureProcessor.lastProcessedPointsPair
+        var tipsColor: UIColor
+        
+        tipsColor = .black
+        //DISPLAYS THE SHAPE
+        cameraView.showPoints([pointsPair.indexTip], color: tipsColor)
+        //*************
+    }
 
+}
 
 extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        var thumbTip: CGPoint?
         var indexTip: CGPoint?
         
         defer {
             DispatchQueue.main.sync {
-                self.processPoints(indexTip: indexTip)
+                self.processPoints(thumbTip: thumbTip, indexTip: indexTip)
             }
         }
 
@@ -139,17 +147,21 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             guard let observation = handPoseRequest.results?.first else {
                 return
             }
-            // Get points for index finger.
+            // Get points for thumb and index finger.
+            let thumbPoints = try observation.recognizedPoints(.thumb)
             let indexFingerPoints = try observation.recognizedPoints(.indexFinger)
+            
+            
             // Look for tip points.
-            guard let indexTipPoint = indexFingerPoints[.indexTip] else {
+            guard let thumbTipPoint = thumbPoints[.thumbTip], let indexTipPoint = indexFingerPoints[.indexTip] else {
                 return
             }
             // Ignore low confidence points.
-            guard indexTipPoint.confidence > 0.3 else {
+            guard thumbTipPoint.confidence > 0.3 && indexTipPoint.confidence > 0.3 else {
                 return
             }
             // Convert points from Vision coordinates to AVFoundation coordinates.
+            thumbTip = CGPoint(x: thumbTipPoint.location.x, y: 1 - thumbTipPoint.location.y)
             indexTip = CGPoint(x: indexTipPoint.location.x, y: 1 - indexTipPoint.location.y)
         } catch {
             cameraFeedSession?.stopRunning()
@@ -160,6 +172,4 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         }
     }
 }
-
-
 

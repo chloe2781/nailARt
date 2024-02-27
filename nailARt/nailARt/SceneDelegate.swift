@@ -1,9 +1,9 @@
-//
-//  SceneDelegate.swift
-//  nailARt
-//
-//  Created by Elizabeth Commisso on 2/25/24.
-//
+/*
+See LICENSE folder for this sample’s licensing information.
+
+Abstract:
+The app's scene delegate object.
+*/
 
 import UIKit
 
@@ -12,3 +12,4 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
 }
+
