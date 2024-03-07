@@ -1,13 +1,13 @@
 //
-//  ExploreView.swift
+//  ProfileViewController.swift
 //  nailARt
 //
-//  Created by Chloe Nguyen on 2/14/24.
+//  Created by Chloe Nguyen on 3/7/24.
 //
 
 import UIKit
 
-class ExploreView: UIViewController {
+class ProfileViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
