@@ -19,7 +19,7 @@ class CameraViewController: UIViewController {
     
     private let drawOverlay = CAShapeLayer()
     private let drawPath = UIBezierPath()
-    private var evidenceBuffer = [HandGestureProcessor.PointsPair]()
+    private var evidenceBuffer = [HandGestureProcessor.PointsSet]()
     private var lastDrawPoint: CGPoint?
     private var isFirstSegment = true
     private var lastObservationTimestamp = Date()
@@ -92,9 +92,9 @@ class CameraViewController: UIViewController {
         cameraFeedSession = session
 }
     
-    func processPoints(thumbTip: CGPoint?, indexTip: CGPoint?) {
+    func processPoints(thumbTip: CGPoint?, indexTip: CGPoint?, middleTip: CGPoint?, ringTip: CGPoint?, littleTip: CGPoint?) {
         // Check that we have both points.
-        guard let thumbPoint = thumbTip, let indexPoint = indexTip else {
+        guard let thumbPoint = thumbTip, let indexPoint = indexTip, let middlePoint = middleTip, let ringPoint = ringTip, let littlePoint = littleTip else {
             // If there were no observations for more than 2 seconds reset gesture processor.
 //            if Date().timeIntervalSince(lastObservationTimestamp) > 2 {
 //                gestureProcessor.reset()
@@ -108,20 +108,24 @@ class CameraViewController: UIViewController {
         let previewLayer = cameraView.previewLayer
         let thumbPointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: thumbPoint)
         let indexPointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: indexPoint)
+        let middlePointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: middlePoint)
+        let ringPointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: ringPoint)
+        let littlePointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: littlePoint)
         
 //        print("Index Finger Tip Coordinates: \(indexPointConverted)")
         
         // Process new points
-        gestureProcessor.processPointsPair((thumbPointConverted, indexPointConverted))
+        // changed from PointsPair to PointsSet to "process" all points. Right now, doesn't do anything
+        gestureProcessor.processPointsSet((thumbPointConverted, indexPointConverted, middlePointConverted, ringPointConverted, littlePointConverted))
     }
     
     private func handleGestureStateChange(state: HandGestureProcessor.State) {
-        let pointsPair = gestureProcessor.lastProcessedPointsPair
+        let pointsSet = gestureProcessor.lastProcessedPointsSet
         var tipsColor: UIColor
         
         tipsColor = .black
         //DISPLAYS THE SHAPE
-        cameraView.showPoints([pointsPair.indexTip], color: tipsColor)
+        cameraView.showPoints([pointsSet.indexTip, pointsSet.middleTip, pointsSet.ringTip, pointsSet.littleTip], color: tipsColor)
         //*************
     }
 
@@ -131,10 +135,13 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         var thumbTip: CGPoint?
         var indexTip: CGPoint?
+        var middleTip: CGPoint?
+        var ringTip: CGPoint?
+        var littleTip: CGPoint?
         
         defer {
             DispatchQueue.main.sync {
-                self.processPoints(thumbTip: thumbTip, indexTip: indexTip)
+                self.processPoints(thumbTip: thumbTip, indexTip: indexTip, middleTip: middleTip, ringTip: ringTip, littleTip: littleTip)
             }
         }
 
@@ -150,19 +157,25 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             // Get points for thumb and index finger.
             let thumbPoints = try observation.recognizedPoints(.thumb)
             let indexFingerPoints = try observation.recognizedPoints(.indexFinger)
+            let middleFingerPoints = try observation.recognizedPoints(.middleFinger)
+            let ringFingerPoints = try observation.recognizedPoints(.ringFinger)
+            let littleFingerPoints = try observation.recognizedPoints(.littleFinger)
             
             
             // Look for tip points.
-            guard let thumbTipPoint = thumbPoints[.thumbTip], let indexTipPoint = indexFingerPoints[.indexTip] else {
+            guard let thumbTipPoint = thumbPoints[.thumbTip], let indexTipPoint = indexFingerPoints[.indexTip], let middleTipPoint = middleFingerPoints[.middleTip], let ringTipPoint = ringFingerPoints[.ringTip], let littleTipPoint = littleFingerPoints[.littleTip] else {
                 return
             }
             // Ignore low confidence points.
-            guard thumbTipPoint.confidence > 0.3 && indexTipPoint.confidence > 0.3 else {
+            guard thumbTipPoint.confidence > 0.3 && indexTipPoint.confidence > 0.3 && middleTipPoint.confidence > 0.3 && ringTipPoint.confidence > 0.3 && littleTipPoint.confidence > 0.3 else {
                 return
             }
             // Convert points from Vision coordinates to AVFoundation coordinates.
             thumbTip = CGPoint(x: thumbTipPoint.location.x, y: 1 - thumbTipPoint.location.y)
             indexTip = CGPoint(x: indexTipPoint.location.x, y: 1 - indexTipPoint.location.y)
+            middleTip = CGPoint(x: middleTipPoint.location.x, y: 1 - middleTipPoint.location.y)
+            ringTip = CGPoint(x: ringTipPoint.location.x, y: 1 - ringTipPoint.location.y)
+            littleTip = CGPoint(x: littleTipPoint.location.x, y: 1 - littleTipPoint.location.y)
         } catch {
             cameraFeedSession?.stopRunning()
             let error = AppError.visionError(error: error)

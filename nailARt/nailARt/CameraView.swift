@@ -14,6 +14,9 @@ class CameraView: UIView {
     private var overlayLayer = CAShapeLayer()
     private var pointsPath = UIBezierPath()
     var drawnLayers: [CALayer] = []
+    
+    var nailWidth: CGFloat = 25
+    var nailHeight: CGFloat = 40
 
 
     var previewLayer: AVCaptureVideoPreviewLayer {
@@ -67,7 +70,7 @@ class CameraView: UIView {
         // draw rectangles at the specified points. later: adjust sizing versus hand distance
         for point in points {
             let rectangleLayer = CALayer()
-            let rectangleSize = CGSize(width: 25, height: 40)
+            let rectangleSize = CGSize(width: nailWidth, height: nailHeight)
             rectangleLayer.bounds = CGRect(origin: .zero, size: rectangleSize)
             rectangleLayer.position = point
             rectangleLayer.cornerRadius = 10

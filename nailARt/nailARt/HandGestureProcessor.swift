@@ -20,7 +20,7 @@ class HandGestureProcessor {
         case unknown
     }
     
-    typealias PointsPair = (thumbTip: CGPoint, indexTip: CGPoint)
+    typealias PointsSet = (thumbTip: CGPoint, indexTip: CGPoint, middleTip: CGPoint, ringTip: CGPoint, littleTip: CGPoint)
     
     private var state = State.unknown {
         didSet {
@@ -33,7 +33,7 @@ class HandGestureProcessor {
     private let evidenceCounterStateTrigger: Int
     
     var didChangeStateClosure: ((State) -> Void)?
-    private (set) var lastProcessedPointsPair = PointsPair(.zero, .zero)
+    private (set) var lastProcessedPointsSet = PointsSet(.zero, .zero, .zero, .zero, .zero)
     
     init(pinchMaxDistance: CGFloat = 40, evidenceCounterStateTrigger: Int = 3) {
         self.pinchMaxDistance = pinchMaxDistance
@@ -47,22 +47,22 @@ class HandGestureProcessor {
     }
     
     //changes the state of the hand gesture reading? -- for changing the color. evidence counts if it is pinched or not?
-    func processPointsPair(_ pointsPair: PointsPair) {
-        lastProcessedPointsPair = pointsPair
-        let distance = pointsPair.indexTip.distance(from: pointsPair.thumbTip)
-        if distance < pinchMaxDistance {
-            // Keep accumulating evidence for pinch state.
-            pinchEvidenceCounter += 1
-            apartEvidenceCounter = 0
-            // Set new state based on evidence amount.
-            state = (pinchEvidenceCounter >= evidenceCounterStateTrigger) ? .pinched : .possiblePinch
-        } else {
-            // Keep accumulating evidence for apart state.
-            apartEvidenceCounter += 1
-            pinchEvidenceCounter = 0
-            // Set new state based on evidence amount.
-            state = (apartEvidenceCounter >= evidenceCounterStateTrigger) ? .apart : .possibleApart
-        }
+    func processPointsSet(_ pointsSet: PointsSet) {
+        lastProcessedPointsSet = pointsSet
+//        let distance = pointsSet.indexTip.distance(from: pointsSet.thumbTip)
+//        if distance < pinchMaxDistance {
+//            // Keep accumulating evidence for pinch state.
+//            pinchEvidenceCounter += 1
+//            apartEvidenceCounter = 0
+//            // Set new state based on evidence amount.
+//            state = (pinchEvidenceCounter >= evidenceCounterStateTrigger) ? .pinched : .possiblePinch
+//        } else {
+        // Keep accumulating evidence for apart state.
+        apartEvidenceCounter += 1
+        pinchEvidenceCounter = 0
+        // Set new state based on evidence amount.
+        state = (apartEvidenceCounter >= evidenceCounterStateTrigger) ? .apart : .possibleApart
+//        }
     }
 }
 
