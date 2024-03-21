@@ -11,7 +11,13 @@ import Vision
 
 class CameraViewController: UIViewController {
 
-    private var cameraView: CameraView { view as! CameraView }
+//    private var cameraView: CameraView { view as! CameraView }
+    
+    @IBOutlet var cameraView: CameraView!
+    
+    @IBOutlet var widthSlider: UISlider!
+    
+    @IBOutlet var heightSlider: UISlider!
     
     private let videoDataOutputQueue = DispatchQueue(label: "CameraFeedDataOutput", qos: .userInteractive)
     private var cameraFeedSession: AVCaptureSession?
@@ -37,6 +43,36 @@ class CameraViewController: UIViewController {
         gestureProcessor.didChangeStateClosure = { [weak self] state in
             self?.handleGestureStateChange(state: state)
         }
+        
+        // sliders
+        widthSlider.value = Float(cameraView.nailWidth)
+        heightSlider.value = Float(cameraView.nailHeight)
+        
+        // Set the minimum and maximum values for the sliders
+        widthSlider.minimumValue = 10
+        widthSlider.maximumValue = 100
+        
+        heightSlider.minimumValue = 20
+        heightSlider.maximumValue = 200
+        
+        // action methods for slider value changes
+        widthSlider.addTarget(self, action: #selector(widthSliderChanged(_:)), for: .valueChanged)
+        heightSlider.addTarget(self, action: #selector(heightSliderChanged(_:)), for: .valueChanged)
+        
+    }
+    
+    @objc func widthSliderChanged(_ sender: UISlider) {
+            // update nail width based on slider value
+            let newWidth = CGFloat(sender.value)
+            cameraView.nailWidth = newWidth
+            cameraView.setNeedsDisplay() // redraw the view
+        }
+        
+    @objc func heightSliderChanged(_ sender: UISlider) {
+        // update nail height based on slider value
+        let newHeight = CGFloat(sender.value)
+        cameraView.nailHeight = newHeight
+        cameraView.setNeedsDisplay() // redraw the view
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -128,7 +164,6 @@ class CameraViewController: UIViewController {
         cameraView.showPoints([pointsSet.indexTip, pointsSet.middleTip, pointsSet.ringTip, pointsSet.littleTip], color: tipsColor)
         //*************
     }
-
 }
 
 extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
