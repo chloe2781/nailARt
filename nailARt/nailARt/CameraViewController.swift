@@ -8,6 +8,7 @@ The app's main view controller object.
 import UIKit
 import AVFoundation
 import Vision
+import CoreMotion
 
 class CameraViewController: UIViewController {
 
@@ -32,6 +33,9 @@ class CameraViewController: UIViewController {
     
     private var gestureProcessor = HandGestureProcessor()
     
+    private let motionManager = CMMotionManager()
+    private var rotationAngle: CGFloat = 0.0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         drawOverlay.frame = view.layer.bounds
@@ -43,6 +47,8 @@ class CameraViewController: UIViewController {
         gestureProcessor.didChangeStateClosure = { [weak self] state in
             self?.handleGestureStateChange(state: state)
         }
+        
+        setupMotionManager()
         
         // sliders
         widthSlider.value = Float(cameraView.nailWidth)
@@ -59,6 +65,22 @@ class CameraViewController: UIViewController {
         widthSlider.addTarget(self, action: #selector(widthSliderChanged(_:)), for: .valueChanged)
         heightSlider.addTarget(self, action: #selector(heightSliderChanged(_:)), for: .valueChanged)
         
+    }
+    
+    private func setupMotionManager() {
+        motionManager.deviceMotionUpdateInterval = 0.1
+        motionManager.startDeviceMotionUpdates(to: .main) { [weak self] (motion, error) in
+            guard let motion = motion else { return }
+            let rotationAngle = self?.calculateRotationAngle(motion)
+//            self?.cameraView.rotateRectangles(by: rotationAngle ?? 0.0)
+        }
+    }
+    
+    private func calculateRotationAngle(_ motion: CMDeviceMotion) -> Double {
+        // Calculate rotation angle based on motion data
+        let rotationRate = motion.rotationRate
+        let rotationAngle = atan2(rotationRate.x, rotationRate.y)
+        return rotationAngle
     }
     
     @objc func widthSliderChanged(_ sender: UISlider) {
@@ -92,6 +114,7 @@ class CameraViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         cameraFeedSession?.stopRunning()
         super.viewWillDisappear(animated)
+        motionManager.stopDeviceMotionUpdates()
     }
     
     func setupAVSession() throws {
@@ -136,7 +159,7 @@ class CameraViewController: UIViewController {
 //                gestureProcessor.reset()
 //            }
             // CLEARS the points when hand leaves the frame
-            cameraView.showPoints([], color: .clear)
+            cameraView.showPoints([], color: .clear, rotationAngle: 0)
             return
         }
         
@@ -161,7 +184,7 @@ class CameraViewController: UIViewController {
         
         tipsColor = .black
         //DISPLAYS THE SHAPE
-        cameraView.showPoints([pointsSet.indexTip, pointsSet.middleTip, pointsSet.ringTip, pointsSet.littleTip], color: tipsColor)
+        cameraView.showPoints([pointsSet.indexTip, pointsSet.middleTip, pointsSet.ringTip, pointsSet.littleTip], color: tipsColor,  rotationAngle: rotationAngle)
         //*************
     }
 }

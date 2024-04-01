@@ -63,16 +63,17 @@ class CameraView: UIView {
     
 
     
-    func showPoints(_ points: [CGPoint], color: UIColor) {
+    func showPoints(_ points: [CGPoint], color: UIColor, rotationAngle: CGFloat) {
         // Clear previous points
         clearPoints()
 
-        // draw rectangles at the specified points. later: adjust sizing versus hand distance
+        // draw rectangles at the specified points
         for point in points {
+            let rotatedRect = rotatedRectangle(at: point, size: CGSize(width: nailWidth, height: nailHeight), rotationAngle: rotationAngle)
             let rectangleLayer = CALayer()
-            let rectangleSize = CGSize(width: nailWidth, height: nailHeight)
-            rectangleLayer.bounds = CGRect(origin: .zero, size: rectangleSize)
-            rectangleLayer.position = point
+            rectangleLayer.bounds = CGRect(origin: .zero, size: rotatedRect.size)
+            rectangleLayer.position = rotatedRect.origin
+            rectangleLayer.setAffineTransform(CGAffineTransform(rotationAngle: rotationAngle))
             rectangleLayer.cornerRadius = 10
             rectangleLayer.backgroundColor = UIColor.black.cgColor
             layer.addSublayer(rectangleLayer)
@@ -80,6 +81,11 @@ class CameraView: UIView {
         }
     }
 
+    private func rotatedRectangle(at origin: CGPoint, size: CGSize, rotationAngle: CGFloat) -> CGRect {
+        let center = CGPoint(x: origin.x + size.width / 2, y: origin.y + size.height / 2)
+        let rotatedCenter = center.applying(CGAffineTransform(rotationAngle: rotationAngle))
+        return CGRect(x: rotatedCenter.x - size.width / 2, y: rotatedCenter.y - size.height / 2, width: size.width, height: size.height)
+    }
     
     func clearPoints() {
         for layer in drawnLayers {
@@ -87,4 +93,15 @@ class CameraView: UIView {
         }
         drawnLayers.removeAll()
     }
+    
+//    func rotateRectangles(by angle: Double) {
+//        // Apply rotation transformation to each rectangle layer
+//        for layer in drawnLayers {
+//            var transform = CATransform3DIdentity
+//            transform = CATransform3DTranslate(transform, layer.bounds.midX, layer.bounds.midY, 0)
+//            transform = CATransform3DRotate(transform, CGFloat(angle), 0, 0, 1)
+//            transform = CATransform3DTranslate(transform, -layer.bounds.midX, -layer.bounds.midY, 0)
+//            layer.transform = transform
+//        }
+//    }
 }
