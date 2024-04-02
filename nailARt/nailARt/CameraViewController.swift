@@ -55,11 +55,11 @@ class CameraViewController: UIViewController {
         heightSlider.value = Float(cameraView.nailHeight)
         
         // Set the minimum and maximum values for the sliders
-        widthSlider.minimumValue = 10
-        widthSlider.maximumValue = 100
+        widthSlider.minimumValue = 100
+        widthSlider.maximumValue = 400
         
         heightSlider.minimumValue = 20
-        heightSlider.maximumValue = 200
+        heightSlider.maximumValue = 400
         
         // action methods for slider value changes
         widthSlider.addTarget(self, action: #selector(widthSliderChanged(_:)), for: .valueChanged)
@@ -159,7 +159,8 @@ class CameraViewController: UIViewController {
 //                gestureProcessor.reset()
 //            }
             // CLEARS the points when hand leaves the frame
-            cameraView.showPoints([], color: .clear, rotationAngle: 0)
+//            cameraView.showPoints([], color: .clear, rotationAngle: 0)
+            cameraView.hideNailImages()
             return
         }
         
@@ -184,7 +185,7 @@ class CameraViewController: UIViewController {
         
         tipsColor = .black
         //DISPLAYS THE SHAPE
-        cameraView.showPoints([pointsSet.indexTip, pointsSet.middleTip, pointsSet.ringTip, pointsSet.littleTip], color: tipsColor,  rotationAngle: rotationAngle)
+        cameraView.showPoints([pointsSet.thumbTip, pointsSet.indexTip, pointsSet.middleTip, pointsSet.ringTip, pointsSet.littleTip], color: tipsColor,  rotationAngle: rotationAngle)
         //*************
     }
 }

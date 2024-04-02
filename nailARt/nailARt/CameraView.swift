@@ -15,8 +15,9 @@ class CameraView: UIView {
     private var pointsPath = UIBezierPath()
     var drawnLayers: [CALayer] = []
     
-    var nailWidth: CGFloat = 25
-    var nailHeight: CGFloat = 40
+    // image files are 2048
+    var nailWidth: CGFloat = 2048 * 0.1
+    var nailHeight: CGFloat = 2048 * 0.1
 
 
     var previewLayer: AVCaptureVideoPreviewLayer {
@@ -38,7 +39,7 @@ class CameraView: UIView {
     }
     
     override func layoutSublayers(of layer: CALayer) {
-        super.layoutSublayers(of: layer)
+        super.layoutSublayers(of: layer) //Thread 1: EXC_BAD_ACCESS (code=1, address=0x8) when hand leaves screen/points disappear
         if layer == previewLayer {
             overlayLayer.frame = layer.bounds
         }
@@ -66,18 +67,39 @@ class CameraView: UIView {
     func showPoints(_ points: [CGPoint], color: UIColor, rotationAngle: CGFloat) {
         // Clear previous points
         clearPoints()
+        
+        guard let nailImage = UIImage(named: "nail9") else {
+            print("Failed to load nail image")
+            return
+        }
 
         // draw rectangles at the specified points
         for point in points {
-            let rotatedRect = rotatedRectangle(at: point, size: CGSize(width: nailWidth, height: nailHeight), rotationAngle: rotationAngle)
-            let rectangleLayer = CALayer()
-            rectangleLayer.bounds = CGRect(origin: .zero, size: rotatedRect.size)
-            rectangleLayer.position = rotatedRect.origin
-            rectangleLayer.setAffineTransform(CGAffineTransform(rotationAngle: rotationAngle))
-            rectangleLayer.cornerRadius = 10
-            rectangleLayer.backgroundColor = UIColor.black.cgColor
-            layer.addSublayer(rectangleLayer)
-            drawnLayers.append(rectangleLayer)
+            // Calculate the origin of the frame to center the nail image at the specified point
+            let origin = CGPoint(x: point.x - nailWidth / 2, y: point.y - nailHeight / 2)
+
+            // Create a UIImageView to hold the nail image
+            let imageView = UIImageView(image: nailImage)
+            imageView.frame = CGRect(origin: origin, size: CGSize(width: nailWidth, height: nailHeight))
+
+            // Apply rotation transformation to the UIImageView
+            imageView.transform = CGAffineTransform(rotationAngle: rotationAngle)
+
+            // Add the UIImageView to the CameraView
+            addSubview(imageView)
+
+            // Store the UIImageView for later removal
+            drawnLayers.append(imageView.layer)
+            
+//            let rotatedRect = rotatedRectangle(at: point, size: CGSize(width: nailWidth, height: nailHeight), rotationAngle: rotationAngle)
+//            let rectangleLayer = CALayer()
+//            rectangleLayer.bounds = CGRect(origin: .zero, size: rotatedRect.size)
+//            rectangleLayer.position = rotatedRect.origin
+//            rectangleLayer.setAffineTransform(CGAffineTransform(rotationAngle: rotationAngle))
+//            rectangleLayer.cornerRadius = 10
+//            rectangleLayer.backgroundColor = UIColor.black.cgColor
+//            layer.addSublayer(rectangleLayer)
+//            drawnLayers.append(rectangleLayer)
         }
     }
 
@@ -89,10 +111,22 @@ class CameraView: UIView {
     
     func clearPoints() {
         for layer in drawnLayers {
-            layer.removeFromSuperlayer()
+            // Check if the layer's superlayer is not nil before removing it
+            if layer.superlayer != nil {
+                layer.removeFromSuperlayer()
+            }
         }
         drawnLayers.removeAll()
     }
+    
+    func hideNailImages() {
+        for subview in subviews {
+            if let imageView = subview as? UIImageView {
+                imageView.isHidden = true
+            }
+        }
+    }
+        
     
 //    func rotateRectangles(by angle: Double) {
 //        // Apply rotation transformation to each rectangle layer
