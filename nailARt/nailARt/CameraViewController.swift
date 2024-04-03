@@ -67,21 +67,78 @@ class CameraViewController: UIViewController {
         
     }
     
+//    private func setupMotionManager() {
+//        motionManager.deviceMotionUpdateInterval = 0.1
+//        motionManager.startDeviceMotionUpdates(to: .main) { [weak self] (motion, error) in
+//            guard let motion = motion else { return }
+//            let rotationAngle = self?.calculateRotationAngle(motion)
+////            self?.cameraView.rotateRectangles(by: rotationAngle ?? 0.0)
+//        }
+//    }
+//    
+//    private func calculateRotationAngle(_ motion: CMDeviceMotion) -> Double {
+//        // Calculate rotation angle based on motion data
+//        let rotationRate = motion.rotationRate
+//        let rotationAngle = atan2(rotationRate.x, rotationRate.y)
+//        return rotationAngle
+//    }
+
+    func findScreenMiddlePoint() -> CGPoint {
+        let screenBounds = UIScreen.main.bounds
+        let screenMiddlePoint = CGPoint(x: screenBounds.midX, y: screenBounds.midY)
+        return screenMiddlePoint
+    }
+    
     private func setupMotionManager() {
         motionManager.deviceMotionUpdateInterval = 0.1
         motionManager.startDeviceMotionUpdates(to: .main) { [weak self] (motion, error) in
             guard let motion = motion else { return }
-            let rotationAngle = self?.calculateRotationAngle(motion)
-//            self?.cameraView.rotateRectangles(by: rotationAngle ?? 0.0)
+            // get the middle tip and middle MCP points -- maybe don't need?
+            guard let middleTip = self?.gestureProcessor.lastProcessedPointsSet.middleTip,
+                  let middleMcp = self?.gestureProcessor.lastProcessedPointsSet.middleMcp else { return }
+            // get the fixed point on the screen (middle point of the device)
+            let fixedPoint = self?.findScreenMiddlePoint()
+            self?.rotationAngle = self?.calculateRotationAngle(middleTip: middleTip, middleMcp: middleMcp, fixedPoint: fixedPoint ?? .zero) ?? 0.0
         }
     }
+    private var previousRotationAngle: CGFloat = 0.0
     
-    private func calculateRotationAngle(_ motion: CMDeviceMotion) -> Double {
-        // Calculate rotation angle based on motion data
-        let rotationRate = motion.rotationRate
-        let rotationAngle = atan2(rotationRate.x, rotationRate.y)
-        return rotationAngle
+    private func calculateRotationAngle(middleTip: CGPoint, middleMcp: CGPoint, fixedPoint: CGPoint) -> CGFloat {
+        let deltaX = middleMcp.x - middleTip.x
+        let deltaY = middleMcp.y - middleTip.y
+        
+        // angle between the line and the horizontal axis
+        var angle = atan2(deltaY, deltaX)
+        
+        // angle between the line and the line connecting the middleTip and the fixedPoint
+//        let deltaXFixed = fixedPoint.x - middleTip.x
+//        let deltaYFixed = fixedPoint.y - middleTip.y
+//        let angleFixed = atan2(deltaYFixed, deltaXFixed)
+        
+        // angle between the line connecting middleTip and middleMcp and the horizontal axis
+        var angleBetweenLines = angle // - angleFixed
+        
+        // angle = zero when the line between middleTip and middleMcp is perpendicular to the horizontal axis
+        angleBetweenLines -= .pi / 2
+        
+        // convert to degrees
+        let degrees = angleBetweenLines * CGFloat(180.0 / .pi)
+        
+        let adjustedAngle = -degrees
+        
+        print("adjusted\(adjustedAngle)")
+        
+        // threshold for when we change it
+        let angleDifference = abs(adjustedAngle - previousRotationAngle)
+        if angleDifference >= 2 {
+            previousRotationAngle = adjustedAngle
+            return adjustedAngle
+        } else {
+            return previousRotationAngle
+        }
     }
+
+
     
     @objc func widthSliderChanged(_ sender: UISlider) {
             // update nail width based on slider value
@@ -150,10 +207,10 @@ class CameraViewController: UIViewController {
         session.commitConfiguration()
         cameraFeedSession = session
 }
-    
-    func processPoints(thumbTip: CGPoint?, indexTip: CGPoint?, middleTip: CGPoint?, ringTip: CGPoint?, littleTip: CGPoint?) {
+
+    func processPoints(thumbTip: CGPoint?, indexTip: CGPoint?, middleTip: CGPoint?, ringTip: CGPoint?, littleTip: CGPoint?, middleMcp: CGPoint?) {
         // Check that we have both points.
-        guard let thumbPoint = thumbTip, let indexPoint = indexTip, let middlePoint = middleTip, let ringPoint = ringTip, let littlePoint = littleTip else {
+        guard let thumbPoint = thumbTip, let indexPoint = indexTip, let middlePoint = middleTip, let ringPoint = ringTip, let littlePoint = littleTip, let middleMcpPoint = middleMcp else {
             // If there were no observations for more than 2 seconds reset gesture processor.
 //            if Date().timeIntervalSince(lastObservationTimestamp) > 2 {
 //                gestureProcessor.reset()
@@ -171,12 +228,13 @@ class CameraViewController: UIViewController {
         let middlePointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: middlePoint)
         let ringPointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: ringPoint)
         let littlePointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: littlePoint)
-        
+        let middleMcpPointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: middleMcpPoint)
 //        print("Index Finger Tip Coordinates: \(indexPointConverted)")
         
         // Process new points
         // changed from PointsPair to PointsSet to "process" all points. Right now, doesn't do anything
-        gestureProcessor.processPointsSet((thumbPointConverted, indexPointConverted, middlePointConverted, ringPointConverted, littlePointConverted))
+        //middleDipPointConverted
+        gestureProcessor.processPointsSet((thumbPointConverted, indexPointConverted, middlePointConverted, ringPointConverted, littlePointConverted, middleMcpPointConverted))
     }
     
     private func handleGestureStateChange(state: HandGestureProcessor.State) {
@@ -197,12 +255,14 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         var middleTip: CGPoint?
         var ringTip: CGPoint?
         var littleTip: CGPoint?
+        var middleMcp: CGPoint?
         
         defer {
             DispatchQueue.main.sync {
-                self.processPoints(thumbTip: thumbTip, indexTip: indexTip, middleTip: middleTip, ringTip: ringTip, littleTip: littleTip)
+                self.processPoints(thumbTip: thumbTip, indexTip: indexTip, middleTip: middleTip, ringTip: ringTip, littleTip: littleTip, middleMcp: middleMcp)
             }
         }
+        //, middleDip: middleDip
 
         let handler = VNImageRequestHandler(cmSampleBuffer: sampleBuffer, orientation: .up, options: [:])
         do {
@@ -219,14 +279,17 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             let middleFingerPoints = try observation.recognizedPoints(.middleFinger)
             let ringFingerPoints = try observation.recognizedPoints(.ringFinger)
             let littleFingerPoints = try observation.recognizedPoints(.littleFinger)
+//            let wristPoint = try observation.recognizedPoint(.wrist) //DOES THIS WORK
             
             
             // Look for tip points.
-            guard let thumbTipPoint = thumbPoints[.thumbTip], let indexTipPoint = indexFingerPoints[.indexTip], let middleTipPoint = middleFingerPoints[.middleTip], let ringTipPoint = ringFingerPoints[.ringTip], let littleTipPoint = littleFingerPoints[.littleTip] else {
+            guard let thumbTipPoint = thumbPoints[.thumbTip], let indexTipPoint = indexFingerPoints[.indexTip], let middleTipPoint = middleFingerPoints[.middleTip], let ringTipPoint = ringFingerPoints[.ringTip], let littleTipPoint = littleFingerPoints[.littleTip], let middleMcpPoint = middleFingerPoints[.middleMCP] else {
                 return
             }
+            // try angle of this line? then move according to this angle?
+            
             // Ignore low confidence points.
-            guard thumbTipPoint.confidence > 0.3 && indexTipPoint.confidence > 0.3 && middleTipPoint.confidence > 0.3 && ringTipPoint.confidence > 0.3 && littleTipPoint.confidence > 0.3 else {
+            guard thumbTipPoint.confidence > 0.3 && indexTipPoint.confidence > 0.3 && middleTipPoint.confidence > 0.3 && ringTipPoint.confidence > 0.3 && littleTipPoint.confidence > 0.3 && middleMcpPoint.confidence > 0.3 else {
                 return
             }
             // Convert points from Vision coordinates to AVFoundation coordinates.
@@ -235,6 +298,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             middleTip = CGPoint(x: middleTipPoint.location.x, y: 1 - middleTipPoint.location.y)
             ringTip = CGPoint(x: ringTipPoint.location.x, y: 1 - ringTipPoint.location.y)
             littleTip = CGPoint(x: littleTipPoint.location.x, y: 1 - littleTipPoint.location.y)
+            middleMcp = CGPoint(x: middleMcpPoint.location.x, y: 1 - middleMcpPoint.location.y)
         } catch {
             cameraFeedSession?.stopRunning()
             let error = AppError.visionError(error: error)

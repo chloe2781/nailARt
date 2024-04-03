@@ -16,8 +16,8 @@ class CameraView: UIView {
     var drawnLayers: [CALayer] = []
     
     // image files are 2048
-    var nailWidth: CGFloat = 2048 * 0.1
-    var nailHeight: CGFloat = 2048 * 0.1
+    var nailWidth: CGFloat = 2048 * 0.05
+    var nailHeight: CGFloat = 2048 * 0.05
 
 
     var previewLayer: AVCaptureVideoPreviewLayer {
@@ -75,22 +75,38 @@ class CameraView: UIView {
 
         // draw rectangles at the specified points
         for point in points {
-            // Calculate the origin of the frame to center the nail image at the specified point
-            let origin = CGPoint(x: point.x - nailWidth / 2, y: point.y - nailHeight / 2)
-
-            // Create a UIImageView to hold the nail image
-            let imageView = UIImageView(image: nailImage)
-            imageView.frame = CGRect(origin: origin, size: CGSize(width: nailWidth, height: nailHeight))
-
-            // Apply rotation transformation to the UIImageView
-            imageView.transform = CGAffineTransform(rotationAngle: rotationAngle)
-
-            // Add the UIImageView to the CameraView
-            addSubview(imageView)
-
-            // Store the UIImageView for later removal
-            drawnLayers.append(imageView.layer)
-            
+            if let rotatedNailImage = rotatedImage(image: nailImage, rotationAngle: rotationAngle) {
+                     //calculate the origin of the frame to center the nail image at the specified point
+                
+//                    print("rotation \(rotationAngle)")
+                    let origin = CGPoint(x: point.x - nailWidth / 2, y: point.y - nailHeight / 2)
+        
+                    // UIImageView to hold the nail image
+                    let imageView = UIImageView(image: nailImage)
+                    imageView.frame = CGRect(origin: origin, size: CGSize(width: nailWidth, height: nailHeight))
+        
+                    // apply rotation transformation to the UIImageView
+                    imageView.transform = CGAffineTransform(rotationAngle: rotationAngle)
+        
+                    // add the UIImageView to the CameraView
+                    addSubview(imageView)
+        
+                    // store the UIImageView for later removal
+                    drawnLayers.append(imageView.layer)
+//                        // Calculate the origin of the frame to center the rotated nail image at the specified point
+//                        let origin = CGPoint(x: point.x - rotatedNailImage.size.width / 2, y: point.y - rotatedNailImage.size.height / 2)
+//                        
+//                        // Create a UIImageView to hold the rotated nail image
+//                        let imageView = UIImageView(image: rotatedNailImage)
+//                        imageView.frame = CGRect(origin: origin, size: rotatedNailImage.size)
+//
+//                        // Add the UIImageView to the CameraView
+//                        addSubview(imageView)
+//
+//                        // Store the UIImageView for later removal
+//                        drawnLayers.append(imageView.layer)
+            }
+              
 //            let rotatedRect = rotatedRectangle(at: point, size: CGSize(width: nailWidth, height: nailHeight), rotationAngle: rotationAngle)
 //            let rectangleLayer = CALayer()
 //            rectangleLayer.bounds = CGRect(origin: .zero, size: rotatedRect.size)
@@ -107,6 +123,25 @@ class CameraView: UIView {
         let center = CGPoint(x: origin.x + size.width / 2, y: origin.y + size.height / 2)
         let rotatedCenter = center.applying(CGAffineTransform(rotationAngle: rotationAngle))
         return CGRect(x: rotatedCenter.x - size.width / 2, y: rotatedCenter.y - size.height / 2, width: size.width, height: size.height)
+    }
+    
+    
+    private func rotatedImage(image: UIImage, rotationAngle: CGFloat) -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
+        guard let context = UIGraphicsGetCurrentContext() else { return nil }
+        
+        // move the origin to the center of the image so that it rotates around the center
+        context.translateBy(x: image.size.width / 2, y: image.size.height / 2)
+        context.rotate(by: rotationAngle)
+        
+        // draw the image
+        image.draw(in: CGRect(x: -image.size.width / 2, y: -image.size.height / 2, width: image.size.width, height: image.size.height))
+        
+        // get rotated image from the context
+        let rotatedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return rotatedImage
     }
     
     func clearPoints() {

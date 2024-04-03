@@ -20,7 +20,7 @@ class HandGestureProcessor {
         case unknown
     }
     
-    typealias PointsSet = (thumbTip: CGPoint, indexTip: CGPoint, middleTip: CGPoint, ringTip: CGPoint, littleTip: CGPoint)
+    typealias PointsSet = (thumbTip: CGPoint, indexTip: CGPoint, middleTip: CGPoint, ringTip: CGPoint, littleTip: CGPoint, middleMcp: CGPoint)
     
     private var state = State.unknown {
         didSet {
@@ -32,8 +32,9 @@ class HandGestureProcessor {
     private let pinchMaxDistance: CGFloat
     private let evidenceCounterStateTrigger: Int
     
+    
     var didChangeStateClosure: ((State) -> Void)?
-    private (set) var lastProcessedPointsSet = PointsSet(.zero, .zero, .zero, .zero, .zero)
+    private (set) var lastProcessedPointsSet = PointsSet(.zero, .zero, .zero, .zero, .zero, .zero)
     
     init(pinchMaxDistance: CGFloat = 40, evidenceCounterStateTrigger: Int = 3) {
         self.pinchMaxDistance = pinchMaxDistance
