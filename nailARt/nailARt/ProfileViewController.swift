@@ -9,10 +9,14 @@ import UIKit
 
 class ProfileViewController: UIViewController {
 
+    @IBOutlet weak var menuBar: UIView!
+    @IBOutlet weak var username: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        menuBar.layer.cornerRadius = 25
     }
     
 

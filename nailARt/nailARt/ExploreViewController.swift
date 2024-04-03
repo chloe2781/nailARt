@@ -1,8 +1,8 @@
 //
-//  ExploreTableViewController.swift
+//  ExploreViewController.swift
 //  nailARt
 //
-//  Created by Chloe Nguyen on 3/5/24.
+//  Created by Chloe Nguyen on 4/1/24.
 //
 
 import UIKit
@@ -13,43 +13,64 @@ import FirebaseStorage
 let db = Firestore.firestore()
 let storageRef = Storage.storage().reference()
 
-struct Post {
-    let p_image: UIImageView
-    let p_author_image: UIImageView
-    let p_title: UILabel
-    let p_saves: UILabel
-}
-//    @IBOutlet weak var postImage: UIImageView!
-//    @IBOutlet weak var postAuthorImage: UIImageView!
-//    @IBOutlet weak var postTitle: UILabel!
-//    @IBOutlet weak var postSaves: UILabel!
-
-// test@gmail.com
-// helloworld
 class CustomTableCell: UITableViewCell {
     
     @IBOutlet weak var postImage: UIImageView!
     @IBOutlet weak var postAuthorImage: UIImageView!
     @IBOutlet weak var postTitle: UILabel!
     @IBOutlet weak var postSaves: UILabel!
+    @IBOutlet weak var postImageBackground: UIImageView!
+    @IBOutlet weak var postContainer: UIImageView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        
+        postImageBackground.layer.cornerRadius = 37
+        postAuthorImage.layer.cornerRadius = 50
+        
+        // Configure the shadow for postImageBackground
+        postImageBackground.layer.shadowColor = UIColor.black.cgColor
+        postImageBackground.layer.shadowOpacity = 0.25
+        postImageBackground.layer.shadowOffset = CGSize(width: 8, height: 9)
+        postImageBackground.layer.shadowRadius = 5
+        
+        // Configure the shadow for postContainer
+        postContainer.layer.shadowColor = UIColor.black.cgColor
+        postContainer.layer.shadowOpacity = 0.15
+        postContainer.layer.shadowOffset = CGSize(width: 10, height: 11)
+        postContainer.layer.shadowRadius = 5
+        
+        postImageBackground.layer.masksToBounds = false
+        postContainer.layer.masksToBounds = false
     }
 }
-//@IBOutlet weak var postView: UITableView!
-class ExploreView: UITableViewController {
 
-    @IBOutlet var postView: UITableView!
+
+struct Post {
+    let p_image: UIImageView
+    let p_author_image: UIImageView
+    let p_title: UILabel
+    let p_saves: UILabel
+}
+
+class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    @IBOutlet weak var postView: UITableView!
+    @IBOutlet weak var menuBar: UIView!
+    @IBAction func profile(_ sender: Any) {
+        self.performSegue(withIdentifier: "exploreToProfile", sender: self)
+
+    }
     
     var postDataArray: [Post] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        postView.rowHeight = UITableView.automaticDimension
-        postView.estimatedRowHeight = 393
+        menuBar.layer.cornerRadius = 25
         
+        postView.delegate = self
+        postView.dataSource = self
+                
         Task {
             await getDataForPosts()
             DispatchQueue.main.async {
@@ -57,11 +78,36 @@ class ExploreView: UITableViewController {
             }
         }
     }
+    
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return postDataArray.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "myCell", for: indexPath) as? CustomTableCell else {
+            return UITableViewCell()
+        }
+        
+        let postData = postDataArray[indexPath.row]
 
+        cell.postImage.image = postData.p_image.image
+        cell.postAuthorImage.image = postData.p_image.image
+        cell.postTitle.text = postData.p_title.text
+        cell.postSaves.text = postData.p_saves.text
+        
+        return cell
+    }
+    
     func getDataForPosts() async {
         let postsRef = db.collection("posts")
         do {
             let querySnapshot = try await postsRef.getDocuments()
+            print("HELLO")
             for document in querySnapshot.documents {
                 let data = document.data()
                 
@@ -76,7 +122,7 @@ class ExploreView: UITableViewController {
                 let nailQuerySnapshot = try await nailQuery.getDocuments()
                 if let nailDocument = nailQuerySnapshot.documents.first,
                    let nailImagePath = nailDocument.data()["image"] as? String {
-                    print("nailPath: \(nailImagePath)")
+//                    print("nailPath: \(nailImagePath)")
                                         
                     // Async fetch for nail and user images
                     let nailImage = UIImageView()
@@ -109,7 +155,7 @@ class ExploreView: UITableViewController {
                 }
                 
             }
-            print("postDataArray:\(self.postDataArray)")
+//            print("postDataArray:\(self.postDataArray)")
         } catch let error {
             print("Error getting documents: \(error)")
         }
@@ -119,7 +165,7 @@ class ExploreView: UITableViewController {
         let imageView = UIImageView()
         let storageRef = Storage.storage().reference()
         let imageRef = storageRef.child(path)
-        print("path: \(path)")
+//        print("path: \(path)")
 
         imageRef.getData(maxSize: 5 * 1024 * 1024) { data, error in
             DispatchQueue.main.async {
@@ -134,34 +180,7 @@ class ExploreView: UITableViewController {
             }
         }
     }
-    
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return postDataArray.count
-    }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "myCell", for: indexPath) as? CustomTableCell else {
-            return UITableViewCell()
-        }
-        
-        let postData = postDataArray[indexPath.row]
-        DispatchQueue.main.async {
-            cell.postImage.image = postData.p_image.image
-            cell.postAuthorImage.image = postData.p_author_image.image
-            cell.postTitle.text = postData.p_title.text
-            cell.postSaves.text = postData.p_saves.text
-        }
-        
-        return cell
-    }
-
-}
     /*
     // MARK: - Navigation
 
@@ -171,7 +190,5 @@ class ExploreView: UITableViewController {
         // Pass the selected object to the new view controller.
     }
     */
-    
 
-
-
+}
