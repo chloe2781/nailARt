@@ -58,7 +58,6 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
     @IBOutlet weak var menuBar: UIView!
     @IBAction func profile(_ sender: Any) {
         self.performSegue(withIdentifier: "exploreToProfile", sender: self)
-
     }
     
     var postDataArray: [Post] = []
@@ -71,6 +70,15 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
         postView.delegate = self
         postView.dataSource = self
                 
+//        Task {
+//            await getDataForPosts()
+//            DispatchQueue.main.async {
+//                self.postView.reloadData()
+//            }
+//        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
         Task {
             await getDataForPosts()
             DispatchQueue.main.async {
@@ -153,7 +161,6 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
                     
                     self.postDataArray.append(post)
                 }
-                
             }
 //            print("postDataArray:\(self.postDataArray)")
         } catch let error {
