@@ -46,9 +46,9 @@ struct PostPreview {
 
 class ProfileViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
 
-//    @IBAction func explore(_ sender: Any) {
-//        self.performSegue(withIdentifier: "profileToExplore", sender: self)
-//    }
+    @IBAction func explore(_ sender: Any) {
+        self.performSegue(withIdentifier: "profileToExplore", sender: self)
+    }
     
     @IBOutlet weak var collectionView: UICollectionView!
     @IBAction func savedButtonAction(_ sender: Any) {
@@ -58,7 +58,7 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
     @IBOutlet weak var pImage: UIImageView!
     @IBOutlet weak var menuBar: UIView!
     @IBOutlet weak var numDesigns: UILabel!
-    @IBOutlet weak var numFollowers: UILabel!
+    @IBOutlet weak var numFollows: UILabel!
     @IBOutlet weak var savedButton: UIButton!
     
     var postPreviewDataArray: [PostPreview] = []
@@ -73,6 +73,9 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
         savedButton.layer.cornerRadius = 8
         
         collectionView.clipsToBounds = false
+        collectionView.showsVerticalScrollIndicator = false
+        
+        pImage.layer.cornerRadius = 50
         
 //        Task {
 //            await fetchPostPreviews()
@@ -109,36 +112,61 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
     
     func fetchPostPreviews() async {
         
-//        guard let userEmail = Auth.auth().currentUser?.email else {
-//            print("No user is currently signed in, or the user does not have an email.")
-//            return
-//        }
-//        var userId: String
-//        if let uid = await fetchUserIdByEmail(userEmail) {
-//            userId = uid
-//            print("Found user_id: \(userId)")
-//        } else {
-//            userId = "u2"
-//        }
+        guard let userEmail = Auth.auth().currentUser?.email else {
+            print("No user is currently signed in, or the user does not have an email.")
+            return
+        }
+        var userId: String
+        if let uid = await fetchUserIdByEmail(userEmail) {
+            userId = uid
+            print("Found user_id: \(userId)")
+        } else {
+            userId = "u2"
+        }
         
-        let userId = "u2"
+//        let userId = "u2"
         
         var profileUsername = UILabel()
         if let username = await fetchUsernamebyId(userId) {
             profileUsername.text = username
             print("Found username: \(profileUsername)")
-        }
-        else {
+        }else {
             profileUsername.text = "helloworld"
         }
         
         pUsername.text = profileUsername.text
+        
+        var follows = UILabel()
+        if let numFollows = await fetchFollowbyId(userId) {
+            follows.text = numFollows
+            print("Found num follows: \(follows)")
+        }else {
+            follows.text = "?"
+        }
+        
+        numFollows.text = follows.text
+        
+        var profileImage = UIImageView()
+        if let picPath = await fetchProfilePathbyId(userId) {
+            await withUnsafeContinuation { continuation in
+                self.fetchImage(from: picPath) { image in
+                    profileImage.image = image.image
+                    continuation.resume()
+                }
+            }
+            print("Found profile pic")
+        }else {
+            profileImage.image = UIImage(named: "profilePicHolder")
+        }
+        
+        pImage.image = profileImage.image
         
         let postsRef = db.collection("posts")
         do {
             let postQuery = postsRef.whereField("user_id", isEqualTo: userId)
             let querySnapshot = try await postQuery.getDocuments()
 //            print("HELLO")
+            numDesigns.text = String(querySnapshot.documents.count)
             for document in querySnapshot.documents {
                 let data = document.data()
                 
@@ -183,7 +211,6 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
     }
     
     func fetchUserIdByEmail(_ userEmail: String) async -> String? {
-//        let db = Firestore.firestore()
         do {
             let querySnapshot = try await db.collection("users").whereField("email", isEqualTo: userEmail).getDocuments()
             guard let userDocument = querySnapshot.documents.first else {
@@ -199,7 +226,6 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
     }
     
     func fetchUsernamebyId(_ userId: String) async -> String? {
-//        let db = Firestore.firestore()
         do {
             let querySnapshot = try await db.collection("users").whereField("user_id", isEqualTo: userId).getDocuments()
             guard let userDocument = querySnapshot.documents.first else {
@@ -208,6 +234,37 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
             }
             let username = userDocument.data()["username"] as? String
             return username
+        } catch {
+            print("Error fetching user document: \(error)")
+            return nil
+        }
+    }
+    
+    func fetchFollowbyId(_ userId: String) async -> String? {
+        do {
+            let querySnapshot = try await db.collection("users").whereField("user_id", isEqualTo: userId).getDocuments()
+            guard let userDocument = querySnapshot.documents.first else {
+                print("No matching user document found")
+                return nil
+            }
+            let follow = userDocument.data()["follow"] as? [String] ?? []
+            let numFollow = follow.count
+            return String(numFollow)
+        } catch {
+            print("Error fetching user document: \(error)")
+            return nil
+        }
+    }
+    
+    func fetchProfilePathbyId(_ userId: String) async -> String? {
+        do {
+            let querySnapshot = try await db.collection("users").whereField("user_id", isEqualTo: userId).getDocuments()
+            guard let userDocument = querySnapshot.documents.first else {
+                print("No matching user document found")
+                return nil
+            }
+            let pic_path = userDocument.data()["profile_pic"] as? String
+            return pic_path
         } catch {
             print("Error fetching user document: \(error)")
             return nil

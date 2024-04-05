@@ -26,7 +26,7 @@ class CustomTableCell: UITableViewCell {
         super.awakeFromNib()
         
         postImageBackground.layer.cornerRadius = 37
-        postAuthorImage.layer.cornerRadius = 50
+        postAuthorImage.layer.cornerRadius = 35
         
         // Configure the shadow for postImageBackground
         postImageBackground.layer.shadowColor = UIColor.black.cgColor
@@ -69,6 +69,8 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         postView.delegate = self
         postView.dataSource = self
+        
+        postView.clipsToBounds = false
                 
 //        Task {
 //            await getDataForPosts()
@@ -104,7 +106,7 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
         let postData = postDataArray[indexPath.row]
 
         cell.postImage.image = postData.p_image.image
-        cell.postAuthorImage.image = postData.p_image.image
+        cell.postAuthorImage.image = postData.p_author_image.image
         cell.postTitle.text = postData.p_title.text
         cell.postSaves.text = postData.p_saves.text
         
@@ -143,11 +145,16 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
                         }
                     }
                     
-                    await withUnsafeContinuation { continuation in
-                        self.fetchImage(from: nailImagePath) { image in
-                            userImage.image = image.image
-                            continuation.resume()
+                    if let picPath = await fetchProfilePathbyId(userId) {
+                        await withUnsafeContinuation { continuation in
+                            self.fetchImage(from: picPath) { image in
+                                userImage.image = image.image
+                                continuation.resume()
+                            }
                         }
+                        print("Found profile pic")
+                    }else {
+                        userImage.image = UIImage(named: "profilePicHolder")
                     }
                     
                     let postTitleLabel = UILabel()
@@ -165,6 +172,21 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
 //            print("postDataArray:\(self.postDataArray)")
         } catch let error {
             print("Error getting documents: \(error)")
+        }
+    }
+    
+    func fetchProfilePathbyId(_ userId: String) async -> String? {
+        do {
+            let querySnapshot = try await db.collection("users").whereField("user_id", isEqualTo: userId).getDocuments()
+            guard let userDocument = querySnapshot.documents.first else {
+                print("No matching user document found")
+                return nil
+            }
+            let pic_path = userDocument.data()["profile_pic"] as? String
+            return pic_path
+        } catch {
+            print("Error fetching user document: \(error)")
+            return nil
         }
     }
     
