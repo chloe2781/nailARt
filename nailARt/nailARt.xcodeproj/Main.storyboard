@@ -15,7 +15,7 @@
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="CameraViewController" customModule="nailARt" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="CameraView" customModule="nailARt" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="Ill-69-vHe">
@@ -38,9 +38,8 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="130" y="95"/>
+            <point key="canvasLocation" x="91" y="-363"/>
         </scene>
-    
         <!--Explore View Controller-->
         <scene sceneID="q2c-mv-7mK">
             <objects>
@@ -476,18 +475,18 @@
             <objects>
                 <viewController id="Az3-dl-Xnj" customClass="SignUpView" customModule="nailARt" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="ZcF-U3-lB4">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="nailARt_logo" translatesAutoresizingMaskIntoConstraints="NO" id="Pto-bI-4R8">
-                                <rect key="frame" x="34" y="59" width="102" height="53"/>
+                                <rect key="frame" x="34" y="0.0" width="102" height="53"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="53" id="BtM-iK-YMf"/>
                                     <constraint firstAttribute="width" constant="102" id="D9i-Zd-KJp"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hrT-gk-8B6">
-                                <rect key="frame" x="117.33333333333333" y="235" width="158.66666666666669" height="46"/>
+                                <rect key="frame" x="117.33333333333333" y="176" width="158.66666666666669" height="46"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="46" id="zT3-Zv-4U4"/>
                                 </constraints>
@@ -496,7 +495,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="username" textAlignment="natural" minimumFontSize="19" translatesAutoresizingMaskIntoConstraints="NO" id="SEN-JO-X0l">
-                                <rect key="frame" x="74.666666666666686" y="342" width="244" height="34"/>
+                                <rect key="frame" x="74.666666666666686" y="283" width="244" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="244" id="jUD-5j-2WL"/>
                                     <constraint firstAttribute="height" constant="34" id="pZN-0r-Wkd"/>
@@ -506,7 +505,7 @@
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" keyboardType="emailAddress" returnKeyType="next" textContentType="username"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="email" textAlignment="natural" minimumFontSize="19" translatesAutoresizingMaskIntoConstraints="NO" id="2Qo-ad-lr0">
-                                <rect key="frame" x="74.666666666666686" y="391" width="244" height="34"/>
+                                <rect key="frame" x="74.666666666666686" y="332" width="244" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="244" id="6Ps-fC-SmZ"/>
                                     <constraint firstAttribute="height" constant="34" id="Xlr-h1-Tka"/>
@@ -516,7 +515,7 @@
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" keyboardType="emailAddress" returnKeyType="next" textContentType="email"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="password" textAlignment="natural" minimumFontSize="19" translatesAutoresizingMaskIntoConstraints="NO" id="UOq-k2-1sk">
-                                <rect key="frame" x="74.666666666666686" y="440" width="244" height="34"/>
+                                <rect key="frame" x="74.666666666666686" y="381" width="244" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="34" id="5kb-0c-P1P"/>
                                     <constraint firstAttribute="width" constant="244" id="wpK-Pn-JhX"/>
@@ -526,7 +525,7 @@
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" keyboardType="emailAddress" returnKeyType="next" secureTextEntry="YES" textContentType="password"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cAo-pG-nVN">
-                                <rect key="frame" x="126.66666666666669" y="510" width="140" height="45"/>
+                                <rect key="frame" x="126.66666666666669" y="451" width="140" height="45"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="BDn-CI-2pJ"/>
                                 </constraints>
@@ -540,7 +539,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="let's get you set up!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dyz-Z2-t2g">
-                                <rect key="frame" x="121.66666666666669" y="281" width="150" height="21"/>
+                                <rect key="frame" x="121.66666666666669" y="222" width="150" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="fBP-Q3-Zw4"/>
                                 </constraints>
@@ -590,16 +589,15 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="ApQ-Be-e8z"/>
+                        <segue destination="Az3-dl-Xnj" kind="show" id="V5Q-3g-j9T"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="82i-xb-uQF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="122.90076335877862" y="-1.4084507042253522"/>
+            <point key="canvasLocation" x="-787" y="94"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="qsY-Wn-Wk4"/>
         <segue reference="vTL-6c-h5t"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" red="0.73725497719999999" green="0.73725497719999999" blue="0.73725497719999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
