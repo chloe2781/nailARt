@@ -60,10 +60,22 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
         self.performSegue(withIdentifier: "exploreToProfile", sender: self)
     }
     
+    @IBAction func seenail(_ sender: Any) {
+        self.performSegue(withIdentifier: "exploreToSeenail", sender: self)
+    }
     var postDataArray: [Post] = []
+    var lastDocumentSnapshot: DocumentSnapshot? // Used for pagination
+    var isFetchingMore = false // Flag to prevent multiple simultaneous fetches
+    var activityIndicator: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        activityIndicator = UIActivityIndicatorView(style: .medium)
+        self.view.addSubview(activityIndicator)
+        
+        
+        self.overrideUserInterfaceStyle = .light
         
         menuBar.layer.cornerRadius = 25
         
@@ -71,6 +83,13 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
         postView.dataSource = self
         
         postView.clipsToBounds = false
+        postView.showsVerticalScrollIndicator = false
+        
+        
+        activityIndicator.center = self.view.center
+        
+        
+        loadData()
                 
 //        Task {
 //            await getDataForPosts()
@@ -81,10 +100,32 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        activityIndicator.startAnimating()
+    }
+    
+    func loadData() {
+        
+        guard !isFetchingMore else { return }
+        isFetchingMore = true
+    
         Task {
-            await getDataForPosts()
+            // loop here
+            var continueLoading = true
+
+            while continueLoading {
+                await getDataForPosts()
+                DispatchQueue.main.async {
+                    self.postView.reloadData()
+                }
+                
+                self.activityIndicator.stopAnimating()
+                
+                continueLoading = lastDocumentSnapshot != nil
+            }
+            
             DispatchQueue.main.async {
-                self.postView.reloadData()
+                self.isFetchingMore = false
+                
             }
         }
     }
@@ -115,17 +156,23 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func getDataForPosts() async {
         let postsRef = db.collection("posts")
+        var query = postsRef.order(by: "date", descending: true).limit(to: 2)
+        if let lastSnapshot = lastDocumentSnapshot {
+            query = query.start(afterDocument: lastSnapshot)
+        }
+        
         do {
-            let querySnapshot = try await postsRef.getDocuments()
-            print("HELLO")
+            let querySnapshot = try await query.getDocuments()
+//            print("HELLO")
+            lastDocumentSnapshot = querySnapshot.documents.last
             for document in querySnapshot.documents {
                 let data = document.data()
                 
                 let nailId = data["nail_id"] as? String ?? ""
                 let userId = data["user_id"] as? String ?? ""
                 
-                print("nailId: \(nailId)")
-                print("userId: \(userId)")
+//                print("nailId: \(nailId)")
+//                print("userId: \(userId)")
 
                 // Fetch nail image
                 let nailQuery = db.collection("nails").whereField("nail_id", isEqualTo: nailId)
@@ -152,7 +199,7 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
                                 continuation.resume()
                             }
                         }
-                        print("Found profile pic")
+//                        print("Found profile pic")
                     }else {
                         userImage.image = UIImage(named: "profilePicHolder")
                     }
@@ -172,6 +219,10 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
 //            print("postDataArray:\(self.postDataArray)")
         } catch let error {
             print("Error getting documents: \(error)")
+            lastDocumentSnapshot = nil
+            DispatchQueue.main.async {
+                self.activityIndicator.stopAnimating() // Stop animating on error
+            }
         }
     }
     

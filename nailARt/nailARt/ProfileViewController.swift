@@ -50,8 +50,12 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
         self.performSegue(withIdentifier: "profileToExplore", sender: self)
     }
     
+    @IBAction func seenail(_ sender: Any) {
+        self.performSegue(withIdentifier: "profileToSeenail", sender: self)
+    }
     @IBOutlet weak var collectionView: UICollectionView!
     @IBAction func savedButtonAction(_ sender: Any) {
+        self.performSegue(withIdentifier: "profileToSaved", sender: self)
     }
     
     @IBOutlet weak var pUsername: UILabel!
@@ -65,6 +69,8 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.overrideUserInterfaceStyle = .light
         
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -94,6 +100,7 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
         }
     }
     
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return postPreviewDataArray.count
     }
@@ -116,6 +123,7 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
             print("No user is currently signed in, or the user does not have an email.")
             return
         }
+        
         var userId: String
         if let uid = await fetchUserIdByEmail(userEmail) {
             userId = uid
@@ -173,7 +181,7 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
                 let nailId = data["nail_id"] as? String ?? ""
 //                let userId = data["user_id"] as? String ?? ""
                 
-                print("nailId: \(nailId)")
+//                print("nailId: \(nailId)")
 //                print("userId: \(userId)")
 
                 // Fetch nail image

@@ -10,6 +10,7 @@ import FirebaseCore
 import FirebaseFirestore
 import FirebaseStorage
 import Vision
+import FirebaseAppCheck
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,6 +21,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        let db = Firestore.firestore()
 //        let storage = Storage.storage()
         
+//        let providerFactory = DeviceCheckProviderFactory()
+//        AppCheck.setAppCheckProviderFactory(providerFactory)
         return true
     }
 

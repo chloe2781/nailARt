@@ -20,6 +20,8 @@ class CameraViewController: UIViewController {
     
     @IBOutlet var heightSlider: UISlider!
     
+    @IBOutlet weak var menuBar: UIView!
+    
     private let videoDataOutputQueue = DispatchQueue(label: "CameraFeedDataOutput", qos: .userInteractive)
     private var cameraFeedSession: AVCaptureSession?
     private var handPoseRequest = VNDetectHumanHandPoseRequest()
@@ -36,8 +38,17 @@ class CameraViewController: UIViewController {
     private let motionManager = CMMotionManager()
     private var rotationAngle: CGFloat = 0.0
     
+    @IBAction func profile(_ sender: Any) {
+        self.performSegue(withIdentifier: "seenailToProfile", sender: self)
+    }
+    
+    @IBAction func explore(_ sender: Any) {
+        self.performSegue(withIdentifier: "seenailToExplore", sender: self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        menuBar.layer.cornerRadius = 25
         drawOverlay.frame = view.layer.bounds
         view.layer.addSublayer(drawOverlay)
         
@@ -126,7 +137,7 @@ class CameraViewController: UIViewController {
         
         let adjustedAngle = -degrees
         
-        print("adjusted\(adjustedAngle)")
+//        print("adjusted\(adjustedAngle)")
         
         // threshold for when we change it
         let angleDifference = abs(adjustedAngle - previousRotationAngle)
