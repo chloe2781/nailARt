@@ -73,7 +73,7 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         activityIndicator = UIActivityIndicatorView(style: .medium)
         self.view.addSubview(activityIndicator)
-        
+        activityIndicator.center = self.view.center
         
         self.overrideUserInterfaceStyle = .light
         
@@ -84,10 +84,6 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         postView.clipsToBounds = false
         postView.showsVerticalScrollIndicator = false
-        
-        
-        activityIndicator.center = self.view.center
-        
         
         loadData()
                 

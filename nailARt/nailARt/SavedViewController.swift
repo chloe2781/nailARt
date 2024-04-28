@@ -14,9 +14,10 @@ import FirebaseAuth
 
 class CustomCollectionViewCellSaved: UICollectionViewCell {
     
-    @IBOutlet weak var cellBackground: UIView!
+    @IBOutlet weak var cellBackground: UIImageView!
     @IBOutlet weak var cellImage: UIImageView!
     @IBOutlet weak var cellSaves: UILabel!
+    
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -39,36 +40,43 @@ class CustomCollectionViewCellSaved: UICollectionViewCell {
 
 class SavedViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource  {
     
-    @IBOutlet var scollectionView: UICollectionView!
-//    @IBOutlet weak var scollectionView: UICollectionView!
+    @IBOutlet var sCollectionView: UICollectionView!
+    @IBAction func backToProfile(_ sender: Any) {
+        self.performSegue(withIdentifier: "savedToProfile", sender: self)
+    }
+    
     var postPreviewDataArray: [PostPreview] = []
     
     var lastDocumentSnapshot: DocumentSnapshot? // Used for pagination
     var isFetchingMore = false // Flag to prevent multiple simultaneous fetches
 
+    var activityIndicator: UIActivityIndicatorView!
 
     override func viewDidLoad() {
-        
-        self.overrideUserInterfaceStyle = .light
         super.viewDidLoad()
-        print("HERE")
         
-        scollectionView.delegate = self
-        scollectionView.dataSource = self
+        activityIndicator = UIActivityIndicatorView(style: .medium)
+        self.view.addSubview(activityIndicator)
+        activityIndicator.center = self.view.center
+
+        self.overrideUserInterfaceStyle = .light
         
-        scollectionView.clipsToBounds = false
-        scollectionView.showsVerticalScrollIndicator = false
+        sCollectionView.delegate = self
+        sCollectionView.dataSource = self
+        
+        sCollectionView.clipsToBounds = false
+        sCollectionView.showsVerticalScrollIndicator = false
         
         loadData()
         // Do any additional setup after loading the view.
     }
     
-    func collectionView(_ scollectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ sCollectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return postPreviewDataArray.count
     }
     
-    func collectionView(_ scollectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = scollectionView.dequeueReusableCell(withReuseIdentifier: "myCollectionCellSaved", for: indexPath) as? CustomCollectionViewCellSaved else {
+    func collectionView(_ sCollectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = sCollectionView.dequeueReusableCell(withReuseIdentifier: "myCollectionCellSaved", for: indexPath) as? CustomCollectionViewCellSaved else {
             return UICollectionViewCell()
         }
         
@@ -80,7 +88,6 @@ class SavedViewController: UIViewController, UICollectionViewDelegate, UICollect
     }
     
     func loadData() {
-        print("HERE")
         guard !isFetchingMore else { return }
         isFetchingMore = true
     
@@ -91,8 +98,9 @@ class SavedViewController: UIViewController, UICollectionViewDelegate, UICollect
             while continueLoading {
                 await getDataForPosts()
                 DispatchQueue.main.async {
-                    self.scollectionView.reloadData()
+                    self.sCollectionView.reloadData()
                 }
+                self.activityIndicator.stopAnimating()
                 
                 continueLoading = lastDocumentSnapshot != nil
             }
@@ -103,13 +111,16 @@ class SavedViewController: UIViewController, UICollectionViewDelegate, UICollect
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        activityIndicator.startAnimating()
+    }
+    
     func getDataForPosts() async {
         
         guard let userEmail = Auth.auth().currentUser?.email else {
             print("No user is currently signed in, or the user does not have an email.")
             return
         }
-        print("HERE")
         var userId: String
         if let uid = await fetchUserIdByEmail(userEmail) {
             userId = uid
@@ -117,9 +128,20 @@ class SavedViewController: UIViewController, UICollectionViewDelegate, UICollect
         } else {
             userId = "u2"
         }
+        
+//        userId = "u2"
+        
+        guard let savedPostIds = await fetchSavedRef(userId) else {
+                print("Failed to fetch saved post IDs or no saved posts available.")
+                return
+            }
+        if savedPostIds.isEmpty {
+            print("No saved posts for this user.")
+            return
+        }
 
         let postsRef = db.collection("posts")
-        var query = postsRef.whereField("user_id", isEqualTo: userId).order(by: "date", descending: true).limit(to: 2)
+        var query = postsRef.whereField("post_id", in: savedPostIds).limit(to: 1)
         if let lastSnapshot = lastDocumentSnapshot {
             query = query.start(afterDocument: lastSnapshot)
         }
@@ -128,13 +150,19 @@ class SavedViewController: UIViewController, UICollectionViewDelegate, UICollect
             let querySnapshot = try await query.getDocuments()
 //            print("HELLO")
             lastDocumentSnapshot = querySnapshot.documents.last
+            
+            if querySnapshot.documents.isEmpty {
+                        lastDocumentSnapshot = nil // Reset if no documents are fetched
+                        return
+                    }
+            
             for document in querySnapshot.documents {
                 let data = document.data()
                 
                 let nailId = data["nail_id"] as? String ?? ""
 //                let userId = data["user_id"] as? String ?? ""
                 
-//                print("nailId: \(nailId)")
+                print("nailId: \(nailId)")
 //                print("userId: \(userId)")
 
                 // Fetch nail image
@@ -168,6 +196,24 @@ class SavedViewController: UIViewController, UICollectionViewDelegate, UICollect
         } catch let error {
             print("Error getting documents: \(error)")
             lastDocumentSnapshot = nil
+            DispatchQueue.main.async {
+                self.activityIndicator.stopAnimating() // Stop animating on error
+            }
+        }
+    }
+    
+    func fetchSavedRef(_ userId: String) async -> [String]? {
+        do {
+            let querySnapshot = try await db.collection("users").whereField("user_id", isEqualTo: userId).getDocuments()
+            guard let userDocument = querySnapshot.documents.first else {
+                print("No matching user document found")
+                return nil
+            }
+            let saved = userDocument.data()["saved"] as? [String] ?? []
+            return saved
+        } catch {
+            print("Error fetching user document: \(error)")
+            return nil
         }
     }
     

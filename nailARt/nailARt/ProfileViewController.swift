@@ -57,6 +57,9 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
     @IBAction func savedButtonAction(_ sender: Any) {
         self.performSegue(withIdentifier: "profileToSaved", sender: self)
     }
+    @IBAction func profileToFollowing(_ sender: Any) {
+        self.performSegue(withIdentifier: "profileToFollowing", sender: self)
+    }
     
     @IBOutlet weak var pUsername: UILabel!
     @IBOutlet weak var pImage: UIImageView!
@@ -67,8 +70,17 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
     
     var postPreviewDataArray: [PostPreview] = []
     
+    var lastDocumentSnapshot: DocumentSnapshot? // Used for pagination
+    var isFetchingMore = false // Flag to prevent multiple simultaneous fetches
+    
+    var activityIndicator: UIActivityIndicatorView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        activityIndicator = UIActivityIndicatorView(style: .medium)
+        self.view.addSubview(activityIndicator)
+        activityIndicator.center = self.view.center
         
         self.overrideUserInterfaceStyle = .light
         
@@ -83,6 +95,8 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
         
         pImage.layer.cornerRadius = 50
         
+        loadData()
+        
 //        Task {
 //            await fetchPostPreviews()
 //            DispatchQueue.main.async {
@@ -92,14 +106,42 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        activityIndicator.startAnimating()
+//        Task {
+//            await fetchPostPreviews()
+//            DispatchQueue.main.async {
+//                self.collectionView.reloadData()
+//            }
+//        }
+    }
+    
+    func loadData() {
+        
+        guard !isFetchingMore else { return }
+        isFetchingMore = true
+    
         Task {
-            await fetchPostPreviews()
+            // loop here
+            var continueLoading = true
+
+            while continueLoading {
+                await fetchPostPreviews()
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+                
+                self.activityIndicator.stopAnimating()
+                
+                continueLoading = lastDocumentSnapshot != nil
+            }
+            
             DispatchQueue.main.async {
-                self.collectionView.reloadData()
+                self.isFetchingMore = false
+                
             }
         }
     }
-    
+
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return postPreviewDataArray.count
@@ -170,10 +212,16 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
         pImage.image = profileImage.image
         
         let postsRef = db.collection("posts")
+        var postQuery = postsRef.whereField("user_id", isEqualTo: userId).limit(to: 1)
+        
+        if let lastSnapshot = lastDocumentSnapshot {
+            postQuery = postQuery.start(afterDocument: lastSnapshot)
+        }
+        
         do {
-            let postQuery = postsRef.whereField("user_id", isEqualTo: userId)
             let querySnapshot = try await postQuery.getDocuments()
 //            print("HELLO")
+            lastDocumentSnapshot = querySnapshot.documents.last
             numDesigns.text = String(querySnapshot.documents.count)
             for document in querySnapshot.documents {
                 let data = document.data()
@@ -215,6 +263,10 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
 //            print("postPreviewDataArray:\(self.postPreviewDataArray)")
         } catch let error {
             print("Error getting documents: \(error)")
+            lastDocumentSnapshot = nil
+            DispatchQueue.main.async {
+                self.activityIndicator.stopAnimating() // Stop animating on error
+            }
         }
     }
     
