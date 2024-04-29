@@ -21,6 +21,13 @@ class CustomTableCell: UITableViewCell {
     @IBOutlet weak var postSaves: UILabel!
     @IBOutlet weak var postImageBackground: UIImageView!
     @IBOutlet weak var postContainer: UIImageView!
+    @IBAction func tryNails(_ sender: Any) {
+        
+    }
+//    @IBOutlet weak var postSaveButton: UIImageView!
+    @IBOutlet weak var saveButton: UIButton!
+    
+    var postID: String?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -42,11 +49,41 @@ class CustomTableCell: UITableViewCell {
         
         postImageBackground.layer.masksToBounds = false
         postContainer.layer.masksToBounds = false
+        
+        saveButton.setImage(UIImage(systemName: "bookmark"), for: .normal)
+        saveButton.setImage(UIImage(systemName: "bookmark.fill"), for: .selected)
+        saveButton.addTarget(self, action: #selector(toggleBookmark), for: .touchUpInside)
+
+    }
+    
+    @objc func toggleBookmark() {
+        guard let postId = postID else { return } // Make sure postID is available
+        saveButton.isSelected = !saveButton.isSelected
+        // Update the local and remote save state
+        updateSaves(isBookmarked: saveButton.isSelected, postId: postId)
+    }
+    
+    func saveBookmarkState(isBookmarked: Bool, postId: String) {
+        UserDefaults.standard.set(isBookmarked, forKey: "bookmarkStatus_\(postId)")
+        let db = Firestore.firestore()
+        let postRef = db.collection("posts").document(postId)
+        postRef.updateData([
+            "saves": FieldValue.increment(Int64(isBookmarked ? 1 : -1))
+        ])
+    }
+    
+    func updateSaves(isBookmarked: Bool, postId: String) {
+        // Adjust the saves count based on the current bookmark state
+        let increment = isBookmarked ? 1 : -1
+        postSaves.text = "\((Int(postSaves.text ?? "0") ?? 0) + increment)"
+        saveBookmarkState(isBookmarked: isBookmarked, postId: postId)
+
     }
 }
 
 
 struct Post {
+    let p_id: String
     let p_image: UIImageView
     let p_author_image: UIImageView
     let p_title: UILabel
@@ -142,10 +179,15 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         let postData = postDataArray[indexPath.row]
 
+        cell.postID = postData.p_id
         cell.postImage.image = postData.p_image.image
         cell.postAuthorImage.image = postData.p_author_image.image
         cell.postTitle.text = postData.p_title.text
         cell.postSaves.text = postData.p_saves.text
+        
+        let isBookmarked = UserDefaults.standard.bool(forKey: "bookmarkStatus_\(postData.p_id)")
+        cell.saveButton.isSelected = isBookmarked
+
         
         return cell
     }
@@ -207,7 +249,7 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
                     postSavesLabel.text = "\(data["saves"] as? Int ?? 0)"
                     
                     // Create Post and append to data
-                    let post = Post(p_image: nailImage, p_author_image: userImage, p_title: postTitleLabel, p_saves: postSavesLabel)
+                    let post = Post(p_id: data["post_id"] as! String, p_image: nailImage, p_author_image: userImage, p_title: postTitleLabel, p_saves: postSavesLabel)
                     
                     self.postDataArray.append(post)
                 }

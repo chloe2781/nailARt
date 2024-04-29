@@ -166,8 +166,40 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="BBF-m7-kA5">
+                                                    <rect key="frame" x="322" y="309.66666666666669" width="44" height="51"/>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <color key="tintColor" red="0.84313726430000002" green="0.65882354970000001" blue="0.67058825489999996" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="44" id="a2N-kC-bCq"/>
+                                                        <constraint firstAttribute="height" constant="44.329999999999998" id="qsm-cE-GFb"/>
+                                                    </constraints>
+                                                    <imageReference key="image" image="hands.sparkles.fill" catalog="system" symbolScale="medium" renderingMode="template"/>
+                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large" weight="semibold"/>
+                                                </imageView>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c3b-2v-VoI">
+                                                    <rect key="frame" x="322" y="307" width="44" height="55"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="Button"/>
+                                                    <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                                    <connections>
+                                                        <action selector="tryNails:" destination="SQB-Jm-h8z" eventType="touchUpInside" id="53V-kQ-nDH"/>
+                                                    </connections>
+                                                </button>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NAr-fF-VEz">
+                                                    <rect key="frame" x="338" y="229" width="20" height="17"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="20" id="0mF-up-TO5"/>
+                                                        <constraint firstAttribute="height" constant="17" id="Gjs-TI-VG7"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Button"/>
+                                                    <buttonConfiguration key="configuration" style="plain" image="bookmark" catalog="system" title=" ">
+                                                        <color key="baseForegroundColor" systemColor="labelColor"/>
+                                                    </buttonConfiguration>
+                                                </button>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstItem="BBF-m7-kA5" firstAttribute="leading" secondItem="Lt7-OS-Ya8" secondAttribute="trailing" constant="-51" id="2Bn-kT-VIR"/>
                                                 <constraint firstItem="9rm-cD-Nlh" firstAttribute="top" secondItem="iCM-Nq-afA" secondAttribute="bottom" constant="17" id="3CR-YP-pre"/>
                                                 <constraint firstItem="u3N-Mr-Y7q" firstAttribute="centerX" secondItem="gxF-8N-5oQ" secondAttribute="centerX" constant="-7" id="Amu-Bq-P4u"/>
                                                 <constraint firstItem="Lt7-OS-Ya8" firstAttribute="leading" secondItem="CBp-hX-SMM" secondAttribute="leadingMargin" constant="-20" id="I63-Fa-xKe"/>
@@ -179,9 +211,12 @@
                                                 <constraint firstItem="6d0-d4-o9l" firstAttribute="leading" secondItem="iCM-Nq-afA" secondAttribute="leading" id="X0y-64-E6f"/>
                                                 <constraint firstItem="iCM-Nq-afA" firstAttribute="leading" secondItem="CBp-hX-SMM" secondAttribute="leadingMargin" constant="4" id="ah0-sZ-g7B"/>
                                                 <constraint firstItem="u3N-Mr-Y7q" firstAttribute="leading" secondItem="iCM-Nq-afA" secondAttribute="trailing" constant="-25" id="f14-7p-GUn"/>
+                                                <constraint firstItem="BBF-m7-kA5" firstAttribute="top" secondItem="Lt7-OS-Ya8" secondAttribute="bottom" constant="-55.999999999999943" id="gfb-oB-K1T"/>
                                                 <constraint firstItem="9rm-cD-Nlh" firstAttribute="leading" secondItem="iCM-Nq-afA" secondAttribute="leading" constant="12" id="hBM-6g-0tm"/>
+                                                <constraint firstItem="NAr-fF-VEz" firstAttribute="centerX" secondItem="u3N-Mr-Y7q" secondAttribute="centerX" constant="2" id="ho5-7G-DIs"/>
                                                 <constraint firstItem="u3N-Mr-Y7q" firstAttribute="top" secondItem="gxF-8N-5oQ" secondAttribute="bottom" constant="107" id="kYS-WG-hws"/>
                                                 <constraint firstItem="iCM-Nq-afA" firstAttribute="leading" secondItem="CBp-hX-SMM" secondAttribute="leading" constant="24" id="nW3-B5-jD3"/>
+                                                <constraint firstItem="NAr-fF-VEz" firstAttribute="top" secondItem="u3N-Mr-Y7q" secondAttribute="bottom" constant="3" id="o6N-qk-qga"/>
                                                 <constraint firstItem="Lt7-OS-Ya8" firstAttribute="top" secondItem="6d0-d4-o9l" secondAttribute="bottom" constant="-317" id="oUv-1E-ygR"/>
                                                 <constraint firstItem="iCM-Nq-afA" firstAttribute="top" secondItem="gxF-8N-5oQ" secondAttribute="bottom" constant="-72" id="zuP-8S-ijt"/>
                                             </constraints>
@@ -194,6 +229,7 @@
                                             <outlet property="postImageBackground" destination="6d0-d4-o9l" id="j4m-t2-5lU"/>
                                             <outlet property="postSaves" destination="u3N-Mr-Y7q" id="Kyo-zG-mXh"/>
                                             <outlet property="postTitle" destination="9rm-cD-Nlh" id="EEY-D3-aOg"/>
+                                            <outlet property="saveButton" destination="NAr-fF-VEz" id="eQz-8n-xU4"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -1095,23 +1131,28 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="mFE-6G-uUe"/>
-        <segue reference="2wR-Kv-zxG"/>
-        <segue reference="vTL-6c-h5t"/>
-        <segue reference="lsA-9N-yPT"/>
+        <segue reference="qsY-Wn-Wk4"/>
+        <segue reference="CQj-tz-3OA"/>
+        <segue reference="cGV-GB-YNN"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" red="0.73725497719999999" green="0.73725497719999999" blue="0.73725497719999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
     <resources>
         <image name="arrow.left" catalog="system" width="128" height="95"/>
+        <image name="bookmark" catalog="system" width="110" height="128"/>
         <image name="bookmark.fill" catalog="system" width="110" height="128"/>
         <image name="explore-active" width="92" height="72"/>
         <image name="explore-inactive" width="92" height="72"/>
         <image name="explore_title" width="393" height="82"/>
         <image name="following" width="146.66667175292969" height="32"/>
+        <image name="hands.sparkles.fill" catalog="system" width="119" height="128"/>
         <image name="nailARt_logo" width="108" height="41"/>
         <image name="profile-active" width="89.333335876464844" height="72"/>
         <image name="profile-inactive" width="89.333335876464844" height="72"/>
         <image name="saved" width="456" height="108"/>
         <image name="seenail-active" width="92" height="72"/>
         <image name="seenail-inactive" width="92" height="72"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>
