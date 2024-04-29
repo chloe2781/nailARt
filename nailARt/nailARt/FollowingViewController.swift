@@ -118,21 +118,21 @@ class FollowingViewController: UIViewController, UITableViewDelegate, UITableVie
 
     func getDataForFollow() async {
         
-//        guard let userEmail = Auth.auth().currentUser?.email else {
-//            print("No user is currently signed in, or the user does not have an email.")
-//            return
-//        }
+        guard let userEmail = Auth.auth().currentUser?.email else {
+            print("No user is currently signed in, or the user does not have an email.")
+            return
+        }
         
         var userId: String
         
-//        if let uid = await fetchUserIdByEmail(userEmail) {
-//            userId = uid
-//            print("Found user_id: \(userId)")
-//        } else {
-//            userId = "u2"
-//        }
+        if let uid = await fetchUserIdByEmail(userEmail) {
+            userId = uid
+            print("Found user_id: \(userId)")
+        } else {
+            userId = "u2"
+        }
         
-        userId = "u2"
+//        userId = "u2"
         
         guard let followIds = await fetchFollowRef(userId) else {
                 print("Failed to fetch saved post IDs or no saved posts available.")

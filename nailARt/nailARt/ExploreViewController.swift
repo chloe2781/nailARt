@@ -113,6 +113,7 @@ class CustomTableCell: UITableViewCell {
 
 struct Post {
     let p_id: String
+    let p_nailId: String
     let p_image: UIImageView
     let p_author_image: UIImageView
     let p_title: UILabel
@@ -278,7 +279,7 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
                     postSavesLabel.text = "\(data["saves"] as? Int ?? 0)"
                     
                     // Create Post and append to data
-                    let post = Post(p_id: data["post_id"] as! String, p_image: nailImage, p_author_image: userImage, p_title: postTitleLabel, p_saves: postSavesLabel)
+                    let post = Post(p_id: data["post_id"] as! String, p_nailId: nailId, p_image: nailImage, p_author_image: userImage, p_title: postTitleLabel, p_saves: postSavesLabel)
                     
                     self.postDataArray.append(post)
                 }
@@ -327,6 +328,23 @@ class ExploreViewController: UIViewController, UITableViewDelegate, UITableViewD
             }
         }
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedPost = postDataArray[indexPath.row]
+        performSegue(withIdentifier: "tryOnNail", sender: selectedPost)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == "tryOnNail" {
+            if let destinationVC = segue.destination as? CameraViewController,
+               let postData = sender as? Post {
+                destinationVC.curNail = "nail" + (postData.p_nailId).dropFirst() // Example property
+                print("ID: \("nail" + (postData.p_nailId).dropFirst())")
+            }
+        }
+    }
+
 
     /*
     // MARK: - Navigation

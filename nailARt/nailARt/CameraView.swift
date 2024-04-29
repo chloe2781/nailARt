@@ -19,6 +19,7 @@ class CameraView: UIView {
     var nailWidth: CGFloat = 2048 * 0.05
     var nailHeight: CGFloat = 2048 * 0.05
 
+    var curNail: String = "nail1"
 
     var previewLayer: AVCaptureVideoPreviewLayer {
         return layer as! AVCaptureVideoPreviewLayer
@@ -53,7 +54,7 @@ class CameraView: UIView {
         // Clear previous points
         clearPoints()
         
-        guard let nailImage = UIImage(named: "nail9") else {
+        guard let nailImage = UIImage(named: curNail) else {
             print("Failed to load nail image")
             return
         }

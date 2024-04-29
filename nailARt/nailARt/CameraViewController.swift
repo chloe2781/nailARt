@@ -10,7 +10,31 @@ import AVFoundation
 import Vision
 import CoreMotion
 
-class CameraViewController: UIViewController {
+class CameraViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return filters.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "FilterCell", for: indexPath) as? FilterCell else {
+            fatalError("Unexpected Index Path")
+        }
+        cell.imageView.image = UIImage(named: filters[indexPath.row])
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+        let selectedFilter = filters[indexPath.row]
+        applyFilter(selectedFilter)
+    }
+
+    private func applyFilter(_ filterName: String) {
+        cameraView.curNail = filterName
+        // Assuming CameraView handles the display logic based on curNail property change
+    }
+    
 
 //    private var cameraView: CameraView { view as! CameraView }
     
@@ -21,6 +45,11 @@ class CameraViewController: UIViewController {
     @IBOutlet var heightSlider: UISlider!
     
     @IBOutlet weak var menuBar: UIView!
+    @IBOutlet weak var nailFiltersCollectionView: UICollectionView!
+    
+    var filters: [String] = ["nail1", "nail2", "nail3", "nail4", "nail5", "nail6"]
+
+    var curNail: String?
     
     private let videoDataOutputQueue = DispatchQueue(label: "CameraFeedDataOutput", qos: .userInteractive)
     private var cameraFeedSession: AVCaptureSession?
@@ -48,6 +77,15 @@ class CameraViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if let curNail = curNail {
+            cameraView.curNail = curNail
+        }
+        
+        setupCollectionView()
+        nailFiltersCollectionView.allowsMultipleSelection = false
+        nailFiltersCollectionView.allowsSelection = true
+        
         menuBar.layer.cornerRadius = 25
         drawOverlay.frame = view.layer.bounds
         view.layer.addSublayer(drawOverlay)
@@ -76,6 +114,17 @@ class CameraViewController: UIViewController {
         widthSlider.addTarget(self, action: #selector(widthSliderChanged(_:)), for: .valueChanged)
         heightSlider.addTarget(self, action: #selector(heightSliderChanged(_:)), for: .valueChanged)
         
+    }
+    
+    private func setupCollectionView() {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.itemSize = CGSize(width: 100, height: 100)
+        nailFiltersCollectionView.collectionViewLayout = layout
+        nailFiltersCollectionView.decelerationRate = .fast
+        nailFiltersCollectionView.dataSource = self
+        nailFiltersCollectionView.delegate = self
+        nailFiltersCollectionView.register(FilterCell.self, forCellWithReuseIdentifier: "FilterCell")
     }
     
 //    private func setupMotionManager() {
@@ -423,3 +472,54 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 }
 
+class FilterCell: UICollectionViewCell {
+    var imageView: UIImageView!
+    var selectionOverlay: UIView!
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setupViews()
+    }
+    
+    private func setupViews() {
+        imageView = UIImageView(frame: self.bounds)
+        imageView.contentMode = .scaleAspectFit
+        imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        self.addSubview(imageView)
+        
+        let overlayHeight = self.bounds.height * 0.9 // Adjust the height to less than full to get an oval
+        let overlayWidth = self.bounds.width * 0.6  // Adjust width as needed
+        let overlayFrame = CGRect(x: (self.bounds.width - overlayWidth) / 2,
+                                  y: (self.bounds.height - overlayHeight) / 2,
+                                  width: overlayWidth,
+                                  height: overlayHeight)
+
+        selectionOverlay = UIView(frame: overlayFrame)
+        selectionOverlay.backgroundColor = .clear
+        selectionOverlay.layer.borderWidth = 1.5
+        selectionOverlay.layer.borderColor = UIColor.clear.cgColor
+        selectionOverlay.layer.cornerRadius = self.bounds.width / 4
+        selectionOverlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        self.addSubview(selectionOverlay)
+    }
+
+    override var isSelected: Bool {
+        didSet {
+                if isSelected {
+                    // Manually convert hex to RGB
+                    let red = 224 / 255.0
+                    let green = 166 / 255.0
+                    let blue = 170 / 255.0
+                    
+                    selectionOverlay.layer.borderColor = UIColor(red: red, green: green, blue: blue, alpha: 1).cgColor
+                } else {
+                    selectionOverlay.layer.borderColor = UIColor.clear.cgColor
+                }
+            }
+    }
+}

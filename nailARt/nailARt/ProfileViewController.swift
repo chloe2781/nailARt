@@ -198,10 +198,14 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
         
         var profileImage = UIImageView()
         if let picPath = await fetchProfilePathbyId(userId) {
-            await withUnsafeContinuation { continuation in
-                self.fetchImage(from: picPath) { image in
-                    profileImage.image = image.image
-                    continuation.resume()
+            if picPath == "" {
+                profileImage.image = UIImage(named: "profilePicHolder")
+            } else {
+                await withUnsafeContinuation { continuation in
+                    self.fetchImage(from: picPath) { image in
+                        profileImage.image = image.image
+                        continuation.resume()
+                    }
                 }
             }
 //            print("Found profile pic")
@@ -370,7 +374,6 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
                 destinationVC.postSaves = postPreview.pp_saves
             }
         }
-
     }
 
 }
