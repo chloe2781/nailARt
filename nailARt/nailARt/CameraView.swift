@@ -83,19 +83,19 @@ class CameraView: UIView {
         }
         
         // Draw points at middle tip and middle PIP points if available
-        if let middleTip = middleTipPoint {
-            let middleTipPointView = UIView(frame: CGRect(x: middleTip.x - 2.5, y: middleTip.y - 2.5, width: 5, height: 5))
-            middleTipPointView.backgroundColor = UIColor.red
-            middleTipPointView.tag = 100 // Unique tag for middle tip point
-            addSubview(middleTipPointView)
-        }
-
-        if let middlePip = middlePipPoint {
-            let middlePipPointView = UIView(frame: CGRect(x: middlePip.x - 2.5, y: middlePip.y - 2.5, width: 5, height: 5))
-            middlePipPointView.backgroundColor = UIColor.blue
-            middlePipPointView.tag = 101 // Unique tag for middle Pip point
-            addSubview(middlePipPointView)
-        }
+//        if let middleTip = middleTipPoint {
+//            let middleTipPointView = UIView(frame: CGRect(x: middleTip.x - 2.5, y: middleTip.y - 2.5, width: 5, height: 5))
+//            middleTipPointView.backgroundColor = UIColor.red
+//            middleTipPointView.tag = 100 // Unique tag for middle tip point
+//            addSubview(middleTipPointView)
+//        }
+//
+//        if let middlePip = middlePipPoint {
+//            let middlePipPointView = UIView(frame: CGRect(x: middlePip.x - 2.5, y: middlePip.y - 2.5, width: 5, height: 5))
+//            middlePipPointView.backgroundColor = UIColor.blue
+//            middlePipPointView.tag = 101 // Unique tag for middle Pip point
+//            addSubview(middlePipPointView)
+//        }
         
         
         
