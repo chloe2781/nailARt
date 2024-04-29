@@ -66,11 +66,40 @@ class CustomTableCell: UITableViewCell {
     func saveBookmarkState(isBookmarked: Bool, postId: String) {
         UserDefaults.standard.set(isBookmarked, forKey: "bookmarkStatus_\(postId)")
         let db = Firestore.firestore()
-        let postRef = db.collection("posts").document(postId)
-        postRef.updateData([
-            "saves": FieldValue.increment(Int64(isBookmarked ? 1 : -1))
-        ])
+        let postsRef = db.collection("posts")
+        let query = postsRef.whereField("post_id", isEqualTo: postId)
+
+        query.getDocuments { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else if let querySnapshot = querySnapshot, !querySnapshot.isEmpty {
+                for document in querySnapshot.documents {
+                    print("Document found with post_id: \(postId), updating...")
+                    self.updateDocument(documentID: document.documentID, isBookmarked: isBookmarked)
+                }
+            } else {
+                print("No document found with post_id: \(postId)")
+            }
+        }
     }
+
+    func updateDocument(documentID: String, isBookmarked: Bool) {
+        let db = Firestore.firestore()
+        let postRef = db.collection("posts").document(documentID)
+
+        // Increment or decrement saves based on bookmark status
+        let incrementValue = isBookmarked ? 1 : -1
+        postRef.updateData([
+            "saves": FieldValue.increment(Int64(incrementValue))
+        ]) { err in
+            if let err = err {
+                print("Error updating document: \(err)")
+            } else {
+                print("Document successfully updated")
+            }
+        }
+    }
+    
     
     func updateSaves(isBookmarked: Bool, postId: String) {
         // Adjust the saves count based on the current bookmark state

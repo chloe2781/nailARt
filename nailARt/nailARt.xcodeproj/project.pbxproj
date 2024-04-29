@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		DD8495182BDE001400277F05 /* FollowingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8495172BDE001400277F05 /* FollowingViewController.swift */; };
+		DD84951A2BDF4A5A00277F05 /* ExplodedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8495192BDF4A5A00277F05 /* ExplodedViewController.swift */; };
 		DD8BB22E2BCF00650089194C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BB21E2BCF00640089194C /* AppDelegate.swift */; };
 		DD8BB22F2BCF00650089194C /* ExploreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8BB21F2BCF00640089194C /* ExploreViewController.swift */; };
 		DD8BB2302BCF00650089194C /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD8BB2202BCF00640089194C /* Launch Screen.storyboard */; };
@@ -54,6 +55,7 @@
 /* Begin PBXFileReference section */
 		72CC35B8245EF9E709BBCA67 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = ../Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		DD8495172BDE001400277F05 /* FollowingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FollowingViewController.swift; path = nailARt/FollowingViewController.swift; sourceTree = SOURCE_ROOT; };
+		DD8495192BDF4A5A00277F05 /* ExplodedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExplodedViewController.swift; path = nailARt/ExplodedViewController.swift; sourceTree = SOURCE_ROOT; };
 		DD8BB21C2BCEFF620089194C /* nailARt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nailARt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD8BB21E2BCF00640089194C /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = nailARt/AppDelegate.swift; sourceTree = SOURCE_ROOT; };
 		DD8BB21F2BCF00640089194C /* ExploreViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ExploreViewController.swift; path = nailARt/ExploreViewController.swift; sourceTree = SOURCE_ROOT; };
@@ -127,6 +129,7 @@
 				DD8BB21E2BCF00640089194C /* AppDelegate.swift */,
 				DD8BB2262BCF00640089194C /* CameraView.swift */,
 				DD8BB22B2BCF00650089194C /* CameraViewController.swift */,
+				DD8495192BDF4A5A00277F05 /* ExplodedViewController.swift */,
 				DD8BB21F2BCF00640089194C /* ExploreViewController.swift */,
 				DD8495172BDE001400277F05 /* FollowingViewController.swift */,
 				DD8BB2292BCF00640089194C /* HandGestureProcessor.swift */,
@@ -264,6 +267,7 @@
 				DD8BB2372BCF00650089194C /* ProfileViewController.swift in Sources */,
 				DD8495182BDE001400277F05 /* FollowingViewController.swift in Sources */,
 				DD8BB2352BCF00650089194C /* LogInView.swift in Sources */,
+				DD84951A2BDF4A5A00277F05 /* ExplodedViewController.swift in Sources */,
 				DD8BB2392BCF00650089194C /* SceneDelegate.swift in Sources */,
 				DD8BB2362BCF00650089194C /* HandGestureProcessor.swift in Sources */,
 				DDA93F662BD9EEF7008B7708 /* SavedViewController.swift in Sources */,

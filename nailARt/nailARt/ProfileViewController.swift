@@ -169,7 +169,7 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
         var userId: String
         if let uid = await fetchUserIdByEmail(userEmail) {
             userId = uid
-            print("Found user_id: \(userId)")
+//            print("Found user_id: \(userId)")
         } else {
             userId = "u2"
         }
@@ -179,7 +179,7 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
         var profileUsername = UILabel()
         if let username = await fetchUsernamebyId(userId) {
             profileUsername.text = username
-            print("Found username: \(profileUsername)")
+//            print("Found username: \(profileUsername)")
         }else {
             profileUsername.text = "helloworld"
         }
@@ -189,7 +189,7 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
         var follows = UILabel()
         if let numFollows = await fetchFollowbyId(userId) {
             follows.text = numFollows
-            print("Found num follows: \(follows)")
+//            print("Found num follows: \(follows)")
         }else {
             follows.text = "?"
         }
@@ -204,7 +204,7 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
                     continuation.resume()
                 }
             }
-            print("Found profile pic")
+//            print("Found profile pic")
         }else {
             profileImage.image = UIImage(named: "profilePicHolder")
         }
@@ -222,7 +222,13 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
             let querySnapshot = try await postQuery.getDocuments()
 //            print("HELLO")
             lastDocumentSnapshot = querySnapshot.documents.last
-            numDesigns.text = String(querySnapshot.documents.count)
+//            numDesigns.text = String(querySnapshot.documents.count)
+            DispatchQueue.main.async {
+                // Cast the current numDesigns.text to an integer, add the new count, and update the label
+                let currentCount = Int(self.numDesigns.text ?? "0") ?? 0
+                let newCount = currentCount + querySnapshot.documents.count
+                self.numDesigns.text = String(newCount)
+            }
             for document in querySnapshot.documents {
                 let data = document.data()
                 
@@ -335,7 +341,7 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
         let imageView = UIImageView()
         let storageRef = Storage.storage().reference()
         let imageRef = storageRef.child(path)
-        print("path: \(path)")
+//        print("path: \(path)")
 
         imageRef.getData(maxSize: 5 * 1024 * 1024) { data, error in
             DispatchQueue.main.async {
@@ -350,4 +356,21 @@ class ProfileViewController: UIViewController, UICollectionViewDelegate, UIColle
             }
         }
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedPostPreview = postPreviewDataArray[indexPath.item]
+        performSegue(withIdentifier: "showDetailPost", sender: selectedPostPreview)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showDetailPost" {
+            if let destinationVC = segue.destination as? ExplodedViewController,
+               let postPreview = sender as? PostPreview {
+                destinationVC.postImage = postPreview.pp_image
+                destinationVC.postSaves = postPreview.pp_saves
+            }
+        }
+
+    }
+
 }
