@@ -104,52 +104,154 @@ class CameraViewController: UIViewController {
         motionManager.deviceMotionUpdateInterval = 0.1
         motionManager.startDeviceMotionUpdates(to: .main) { [weak self] (motion, error) in
             guard let motion = motion else { return }
-            // get the middle tip and middle MCP points -- maybe don't need?
+            // get the middle tip and middle PIP points
             guard let middleTip = self?.gestureProcessor.lastProcessedPointsSet.middleTip,
-                  let middleMcp = self?.gestureProcessor.lastProcessedPointsSet.middleMcp else { return }
-            // get the fixed point on the screen (middle point of the device)
-            let fixedPoint = self?.findScreenMiddlePoint()
-            self?.rotationAngle = self?.calculateRotationAngle(middleTip: middleTip, middleMcp: middleMcp, fixedPoint: fixedPoint ?? .zero) ?? 0.0
+                  let middlePip = self?.gestureProcessor.lastProcessedPointsSet.middlePip else { return }
+//            // get the fixed point on the screen (middle point of the device)
+//            let fixedPoint = self?.findScreenMiddlePoint()
+            self?.rotationAngle = self?.calculateRotationAngle(middleTip: middleTip, middlePip: middlePip) ?? 0.0
+
         }
     }
     private var previousRotationAngle: CGFloat = 0.0
     
-    private func calculateRotationAngle(middleTip: CGPoint, middleMcp: CGPoint, fixedPoint: CGPoint) -> CGFloat {
-        let deltaX = middleMcp.x - middleTip.x
-        let deltaY = middleMcp.y - middleTip.y
+    
+
+    private func calculateRotationAngle(middleTip: CGPoint, middlePip: CGPoint) -> CGFloat {
+        let deltaX = middlePip.x - middleTip.x
+        let deltaY = middlePip.y - middleTip.y
         
-        // angle between the line and the horizontal axis
-        var angle = atan2(deltaY, deltaX)
+        // calculate the angle between the vectors formed by middleTip and middlePip
+        let measured_angle = atan2(deltaY, deltaX)
         
-        // angle between the line and the line connecting the middleTip and the fixedPoint
-//        let deltaXFixed = fixedPoint.x - middleTip.x
-//        let deltaYFixed = fixedPoint.y - middleTip.y
-//        let angleFixed = atan2(deltaYFixed, deltaXFixed)
+        var angle = measured_angle - (CGFloat.pi / 2)
         
-        // angle between the line connecting middleTip and middleMcp and the horizontal axis
-        var angleBetweenLines = angle // - angleFixed
-        
-        // angle = zero when the line between middleTip and middleMcp is perpendicular to the horizontal axis
-        angleBetweenLines -= .pi / 2
-        
-        // convert to degrees
-        let degrees = angleBetweenLines * CGFloat(180.0 / .pi)
-        
-        let adjustedAngle = -degrees
-        
-//        print("adjusted\(adjustedAngle)")
-        
-        // threshold for when we change it
-        let angleDifference = abs(adjustedAngle - previousRotationAngle)
-        if angleDifference >= 2 {
-            previousRotationAngle = adjustedAngle
-            return adjustedAngle
-        } else {
-            return previousRotationAngle
+        // ensure that the angle is within the range of 0 to 2pi radians
+        angle = angle.truncatingRemainder(dividingBy: 2 * CGFloat.pi)
+        if angle < 0 {
+            angle += 2 * CGFloat.pi
         }
+        
+//        print("\(angle)")
+        
+        // manual tuning of angle in radians (measurements correspond to unit circle we measured)
+        
+        let tolerance =  CGFloat.pi / 12 //15 deg
+        let cardinal_tolerance = CGFloat.pi / 9 //20 deg
+        
+        //up
+        if abs(angle - 0) <= cardinal_tolerance {
+            return 0
+        }
+        
+        //15
+        if abs(angle - CGFloat.pi/12) <= tolerance {
+            return CGFloat.pi/12
+        }
+
+        //30
+        if abs(angle - CGFloat.pi/6) <= tolerance {
+            return CGFloat.pi/6
+        }
+
+        //45 right up diagonal
+        if abs(angle - CGFloat.pi/4) <= tolerance {
+            return CGFloat.pi/4
+        }
+
+        //60
+        if abs(angle - CGFloat.pi/3) <= tolerance {
+            return CGFloat.pi/3
+        }
+        
+        //75
+        if abs(angle - 5*CGFloat.pi/12) <= tolerance {
+            return 5*CGFloat.pi/12
+        }
+
+        //90 right horizontal
+        if abs(angle - CGFloat.pi/2) <= cardinal_tolerance {
+            return CGFloat.pi/2
+        }
+        
+        //105
+        if abs(angle - 7*CGFloat.pi/12) <= tolerance {
+            return 7*CGFloat.pi/12
+        }
+
+        //120
+        if abs(angle - 2*CGFloat.pi/3) <= tolerance {
+            return 2*CGFloat.pi/3
+        }
+
+        //135 right down diagonal
+        if abs(angle - 3*CGFloat.pi/4) <= tolerance {
+            return 3*CGFloat.pi/4
+        }
+
+        //150
+        if abs(angle - 5*CGFloat.pi/6) <= tolerance {
+            return 5*CGFloat.pi/6
+        }
+
+        //180 down
+        if abs(angle - CGFloat.pi) <= cardinal_tolerance {
+            return CGFloat.pi
+        }
+
+        //210
+        if abs(angle - 7*CGFloat.pi/6) <= tolerance {
+            return 7*CGFloat.pi/6
+        }
+
+        //225 left down diagonal
+        if abs(angle - 5*CGFloat.pi/4) <= tolerance {
+            return 5*CGFloat.pi/4
+        }
+
+        //240
+        if abs(angle - 4*CGFloat.pi/3) <= tolerance {
+            return 4*CGFloat.pi/3
+        }
+        
+        //255
+        if abs(angle - 17*CGFloat.pi/12) <= tolerance {
+            return 17*CGFloat.pi/12
+        }
+
+        //270 left horizontal
+        if abs(angle - 3*CGFloat.pi/2) <= cardinal_tolerance {
+            return 3*CGFloat.pi/2
+        }
+        
+        //285
+        if abs(angle - 19*CGFloat.pi/12) <= tolerance {
+            return 19*CGFloat.pi/12
+        }
+
+        //300
+        if abs(angle - 5*CGFloat.pi/3) <= tolerance {
+            return 5*CGFloat.pi/3
+        }
+
+        //315 left up diagonal
+        if abs(angle - 7*CGFloat.pi/4) <= tolerance {
+            return 7*CGFloat.pi/4
+        }
+        
+        //330
+        if abs(angle - 11*CGFloat.pi/6) <= tolerance {
+            return 11*CGFloat.pi/6
+        }
+        
+        //345
+        if abs(angle - 23*CGFloat.pi/12) <= tolerance {
+            return 23*CGFloat.pi/12
+        }
+  
+        
+        return 0
     }
-
-
     
     @objc func widthSliderChanged(_ sender: UISlider) {
             // update nail width based on slider value
@@ -219,9 +321,9 @@ class CameraViewController: UIViewController {
         cameraFeedSession = session
 }
 
-    func processPoints(thumbTip: CGPoint?, indexTip: CGPoint?, middleTip: CGPoint?, ringTip: CGPoint?, littleTip: CGPoint?, middleMcp: CGPoint?) {
+    func processPoints(thumbTip: CGPoint?, indexTip: CGPoint?, middleTip: CGPoint?, ringTip: CGPoint?, littleTip: CGPoint?, middlePip: CGPoint?) {
         // Check that we have both points.
-        guard let thumbPoint = thumbTip, let indexPoint = indexTip, let middlePoint = middleTip, let ringPoint = ringTip, let littlePoint = littleTip, let middleMcpPoint = middleMcp else {
+        guard let thumbPoint = thumbTip, let indexPoint = indexTip, let middlePoint = middleTip, let ringPoint = ringTip, let littlePoint = littleTip, let middlePipPoint = middlePip else {
             // If there were no observations for more than 2 seconds reset gesture processor.
 //            if Date().timeIntervalSince(lastObservationTimestamp) > 2 {
 //                gestureProcessor.reset()
@@ -239,13 +341,13 @@ class CameraViewController: UIViewController {
         let middlePointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: middlePoint)
         let ringPointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: ringPoint)
         let littlePointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: littlePoint)
-        let middleMcpPointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: middleMcpPoint)
+        let middlePipPointConverted = previewLayer.layerPointConverted(fromCaptureDevicePoint: middlePipPoint)
 //        print("Index Finger Tip Coordinates: \(indexPointConverted)")
         
         // Process new points
         // changed from PointsPair to PointsSet to "process" all points. Right now, doesn't do anything
         //middleDipPointConverted
-        gestureProcessor.processPointsSet((thumbPointConverted, indexPointConverted, middlePointConverted, ringPointConverted, littlePointConverted, middleMcpPointConverted))
+        gestureProcessor.processPointsSet((thumbPointConverted, indexPointConverted, middlePointConverted, ringPointConverted, littlePointConverted, middlePipPointConverted))
     }
     
     private func handleGestureStateChange(state: HandGestureProcessor.State) {
@@ -254,7 +356,8 @@ class CameraViewController: UIViewController {
         
         tipsColor = .black
         //DISPLAYS THE SHAPE
-        cameraView.showPoints([pointsSet.thumbTip, pointsSet.indexTip, pointsSet.middleTip, pointsSet.ringTip, pointsSet.littleTip], color: tipsColor,  rotationAngle: rotationAngle)
+//        cameraView.showPoints([pointsSet.thumbTip, pointsSet.indexTip, pointsSet.middleTip, pointsSet.ringTip, pointsSet.littleTip], color: tipsColor,  rotationAngle: rotationAngle)
+        cameraView.showPoints([pointsSet.thumbTip, pointsSet.indexTip, pointsSet.middleTip, pointsSet.ringTip, pointsSet.littleTip], color: tipsColor,  rotationAngle: rotationAngle, middleTipPoint: pointsSet.middleTip, middlePipPoint: pointsSet.middlePip)
         //*************
     }
 }
@@ -266,11 +369,11 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         var middleTip: CGPoint?
         var ringTip: CGPoint?
         var littleTip: CGPoint?
-        var middleMcp: CGPoint?
+        var middlePip: CGPoint?
         
         defer {
             DispatchQueue.main.sync {
-                self.processPoints(thumbTip: thumbTip, indexTip: indexTip, middleTip: middleTip, ringTip: ringTip, littleTip: littleTip, middleMcp: middleMcp)
+                self.processPoints(thumbTip: thumbTip, indexTip: indexTip, middleTip: middleTip, ringTip: ringTip, littleTip: littleTip, middlePip: middlePip)
             }
         }
         //, middleDip: middleDip
@@ -294,13 +397,13 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             
             
             // Look for tip points.
-            guard let thumbTipPoint = thumbPoints[.thumbTip], let indexTipPoint = indexFingerPoints[.indexTip], let middleTipPoint = middleFingerPoints[.middleTip], let ringTipPoint = ringFingerPoints[.ringTip], let littleTipPoint = littleFingerPoints[.littleTip], let middleMcpPoint = middleFingerPoints[.middleMCP] else {
+            guard let thumbTipPoint = thumbPoints[.thumbTip], let indexTipPoint = indexFingerPoints[.indexTip], let middleTipPoint = middleFingerPoints[.middleTip], let ringTipPoint = ringFingerPoints[.ringTip], let littleTipPoint = littleFingerPoints[.littleTip], let middlePipPoint = middleFingerPoints[.middlePIP] else {
                 return
             }
             // try angle of this line? then move according to this angle?
             
             // Ignore low confidence points.
-            guard thumbTipPoint.confidence > 0.3 && indexTipPoint.confidence > 0.3 && middleTipPoint.confidence > 0.3 && ringTipPoint.confidence > 0.3 && littleTipPoint.confidence > 0.3 && middleMcpPoint.confidence > 0.3 else {
+            guard thumbTipPoint.confidence > 0.3 && indexTipPoint.confidence > 0.3 && middleTipPoint.confidence > 0.3 && ringTipPoint.confidence > 0.3 && littleTipPoint.confidence > 0.3 && middlePipPoint.confidence > 0.3 else {
                 return
             }
             // Convert points from Vision coordinates to AVFoundation coordinates.
@@ -309,7 +412,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             middleTip = CGPoint(x: middleTipPoint.location.x, y: 1 - middleTipPoint.location.y)
             ringTip = CGPoint(x: ringTipPoint.location.x, y: 1 - ringTipPoint.location.y)
             littleTip = CGPoint(x: littleTipPoint.location.x, y: 1 - littleTipPoint.location.y)
-            middleMcp = CGPoint(x: middleMcpPoint.location.x, y: 1 - middleMcpPoint.location.y)
+            middlePip = CGPoint(x: middlePipPoint.location.x, y: 1 - middlePipPoint.location.y)
         } catch {
             cameraFeedSession?.stopRunning()
             let error = AppError.visionError(error: error)
