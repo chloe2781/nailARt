@@ -20,7 +20,7 @@ class HandGestureProcessor {
         case unknown
     }
     
-    typealias PointsSet = (thumbTip: CGPoint, indexTip: CGPoint, middleTip: CGPoint, ringTip: CGPoint, littleTip: CGPoint, middleMcp: CGPoint)
+    typealias PointsSet = (thumbTip: CGPoint, indexTip: CGPoint, middleTip: CGPoint, ringTip: CGPoint, littleTip: CGPoint, middlePip: CGPoint)
     
     private var state = State.unknown {
         didSet {
