@@ -15,4 +15,7 @@ The app will benefit the target audience by making the process of choosing nail 
 
 ## About
 
-I'm Chloe and I do nails for fun now (used to be professionally). As I spend so much time doing and designing nails, it's very often to hate the vision that I have for a set of nails after it's done. Similarly, my friends and customers felt the same way after they have their set done because so many things could go wrong (same shape different length look differently on different hands, just to start with). I needed a solution to be more sustainable to pursue  my love for nail art, and here it is, NailARt (get it cuz AR in art :) )
+I'm Chloe and I do nails for fun now (used to be professionally). As I spend so much time doing and designing nails, it's very often to hate the vision that I have for a set of nails after it's done. Similarly, my friends and customers felt the same way after they have their set done because so many things could go wrong (same shape different length look differently on different hands, just to start with). I needed a solution to be more sustainable to pursue my love for nail art, and here it is, NailARt (get it cuz AR in art :) )
+
+
+And I'm Liz, the mega-coder to Chloe's super-coder. I hopped on this project at the start of 2024 to help Chloe develop this app because I believed (and still do) that nailARt could fill this niche and blend all existing nail apps together to make the best experience for nail technicians and customers alike (but I also just love working together with Chloe). I love art and design, and I breathe code, so nailARt was perfect for me. We hope it's perfect for you too <3. 
